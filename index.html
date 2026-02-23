@@ -482,11 +482,234 @@
     .row { flex-direction: column; }
     .row .btn { margin-bottom: 0; }
   }
+
+  /* ===== BLIND VOTE BADGE ===== */
+  .blind-badge {
+    display: inline-block;
+    background: rgba(255,63,108,0.15);
+    border: 1px solid rgba(255,63,108,0.4);
+    color: var(--accent);
+    padding: 4px 14px;
+    border-radius: 100px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+
+  /* ===== TTS INDICATOR ===== */
+  .tts-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 16px;
+    margin-bottom: 14px;
+    font-size: 14px;
+    color: var(--accent3);
+    font-weight: 600;
+  }
+  .tts-wave {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 20px;
+  }
+  .tts-wave span {
+    display: block;
+    width: 4px;
+    background: var(--accent3);
+    border-radius: 2px;
+    animation: ttsWave 0.8s ease-in-out infinite;
+  }
+  .tts-wave span:nth-child(2) { animation-delay: 0.1s; }
+  .tts-wave span:nth-child(3) { animation-delay: 0.2s; }
+  .tts-wave span:nth-child(4) { animation-delay: 0.3s; }
+  .tts-wave span:nth-child(5) { animation-delay: 0.15s; }
+  @keyframes ttsWave {
+    0%, 100% { height: 4px; }
+    50% { height: 18px; }
+  }
+
+  /* ===== HOST DISPLAY WINDOW ===== */
+  .host-display-btn {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    z-index: 999;
+    background: var(--accent2);
+    color: #000;
+    border: none;
+    border-radius: 100px;
+    padding: 10px 18px;
+    font-family: var(--font-display);
+    font-size: 16px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(255,204,0,0.3);
+    transition: all 0.2s;
+    display: none;
+  }
+  .host-display-btn:hover { transform: scale(1.05); }
+  .host-display-btn.visible { display: flex; align-items: center; gap: 8px; }
+
+  /* ===== HOST TV DISPLAY SCREEN ===== */
+  #screen-tv {
+    background: var(--bg);
+    min-height: 100vh;
+  }
+  .tv-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px;
+    text-align: center;
+  }
+  .tv-prompt {
+    font-size: clamp(28px, 5vw, 52px);
+    font-weight: 700;
+    line-height: 1.3;
+    margin: 30px 0;
+    color: var(--text);
+  }
+  .tv-answers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 30px;
+  }
+  .tv-answer-card {
+    background: var(--surface);
+    border: 2px solid var(--border);
+    border-radius: 16px;
+    padding: 30px 24px;
+    font-size: clamp(18px, 2.5vw, 28px);
+    font-weight: 600;
+    line-height: 1.4;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    transition: all 0.4s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .tv-answer-card.revealed {
+    border-color: var(--accent3);
+    background: rgba(0,229,255,0.06);
+  }
+  .tv-answer-card.winning {
+    border-color: var(--accent2);
+    background: rgba(255,204,0,0.08);
+    box-shadow: 0 0 40px rgba(255,204,0,0.2);
+  }
+  .tv-answer-card .tv-player-name {
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: none;
+  }
+  .tv-answer-card.revealed .tv-player-name { display: block; color: var(--accent3); }
+  .tv-answer-card.winning .tv-player-name { color: var(--accent2); }
+  .tv-vote-count {
+    font-family: var(--font-display);
+    font-size: 48px;
+    color: var(--accent2);
+    display: none;
+  }
+  .tv-answer-card.revealed .tv-vote-count { display: block; }
+  .tv-phase-label {
+    font-family: var(--font-display);
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .tv-room-code {
+    font-family: var(--font-display);
+    font-size: 56px;
+    letter-spacing: 10px;
+    color: var(--accent2);
+    margin: 20px 0 8px;
+  }
+  .tv-player-chips {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .tv-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+  .tv-timer {
+    font-family: var(--font-display);
+    font-size: 80px;
+    color: var(--accent);
+    line-height: 1;
+    margin: 10px 0;
+  }
+  .tv-answering-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .tv-answered-chip {
+    padding: 10px 20px;
+    border-radius: 100px;
+    font-size: 16px;
+    font-weight: 600;
+    border: 2px solid var(--border);
+    background: var(--surface);
+    transition: all 0.3s;
+  }
+  .tv-answered-chip.done {
+    border-color: var(--accent3);
+    background: rgba(0,229,255,0.1);
+    color: var(--accent3);
+  }
+
+  /* Settings toggle rows */
+  .setting-toggle {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .setting-toggle:last-child { border-bottom: none; }
+  .setting-toggle input[type=checkbox] { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--accent); }
+  .setting-toggle-label { flex: 1; }
+  .setting-toggle-label strong { display: block; font-size: 15px; margin-bottom: 2px; }
+  .setting-toggle-label span { font-size: 13px; color: var(--muted); }
 </style>
 </head>
 <body>
 
 <button class="mute-btn" id="mute-btn" onclick="toggleMute()" title="Toggle sound">🔊</button>
+<button class="host-display-btn" id="host-display-btn" onclick="openHostDisplay()" title="Open TV Display">📺 TV MODE</button>
+
+<!-- ===== TV HOST DISPLAY SCREEN (opens in new window) ===== -->
+<div id="screen-tv" class="screen">
+  <div class="tv-container">
+    <div id="tv-content">
+      <!-- dynamically populated -->
+    </div>
+  </div>
+</div>
 
 <!-- ===== HOME SCREEN ===== -->
 <div id="screen-home" class="screen active">
@@ -563,6 +786,33 @@
 
         <label style="display:flex;align-items:center;gap:10px;cursor:pointer;">
           <input type="checkbox" id="include-custom" style="width:auto;margin:0;"> Include custom prompts with selected pack
+        </label>
+
+        <hr class="divider">
+        <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:var(--accent2);margin-bottom:12px;">EXTRA FEATURES</div>
+
+        <label class="setting-toggle">
+          <input type="checkbox" id="blind-voting">
+          <div class="setting-toggle-label">
+            <strong>🕵️ Blind Voting</strong>
+            <span>Answers are shown without player names during voting — revealed only at results</span>
+          </div>
+        </label>
+
+        <label class="setting-toggle">
+          <input type="checkbox" id="read-aloud" checked>
+          <div class="setting-toggle-label">
+            <strong>🔊 Read Answers Aloud</strong>
+            <span>When voting starts, each answer is read aloud using your device's voice</span>
+          </div>
+        </label>
+
+        <label class="setting-toggle">
+          <input type="checkbox" id="host-display-mode">
+          <div class="setting-toggle-label">
+            <strong>📺 Host Display Mode</strong>
+            <span>Opens a big-screen TV view in a new window — perfect for casting to a TV</span>
+          </div>
         </label>
       </div>
 
@@ -674,7 +924,16 @@
   <div class="container" style="padding-top: 30px;">
     <span class="logo" style="font-size: 36px; margin-bottom: 16px; display:block;">MARQUIP</span>
     <div class="round-badge" id="vote-round-badge">VOTE NOW!</div>
+
+    <div id="tts-indicator" style="display:none;">
+      <div class="tts-bar">
+        <div class="tts-wave"><span></span><span></span><span></span><span></span><span></span></div>
+        <span id="tts-reading-text">Reading answers aloud...</span>
+      </div>
+    </div>
     
+    <div id="blind-vote-badge" style="display:none;"><div class="blind-badge">🕵️ Blind Voting — names hidden until results</div></div>
+
     <div class="timer-text" id="vote-timer">30</div>
     <div class="timer-bar-wrap"><div class="timer-bar" id="vote-timer-bar" style="width:100%"></div></div>
 
@@ -1221,6 +1480,9 @@ function startHosting() {
     promptPack: document.getElementById('prompt-pack').value,
     includeCustom: document.getElementById('include-custom').checked,
     customPrompts: [...state.customPrompts],
+    blindVoting: document.getElementById('blind-voting').checked,
+    readAloud: document.getElementById('read-aloud').checked,
+    hostDisplay: document.getElementById('host-display-mode').checked,
   };
 
   const roomCode = generateRoomCode();
@@ -1279,6 +1541,7 @@ function handleClientMessage(conn, data) {
   }
   if (data.type === 'answer') {
     state.answers[conn.peer] = data.answer;
+    trackAnswerForTV(conn.peer);
     checkAllAnswered();
   }
   if (data.type === 'vote') {
@@ -1390,6 +1653,8 @@ function renderLobbyPlayers() {
     `<div class="player-chip"><div class="dot"></div>${p.name}${p.id === state.myId ? ' (you)' : ''}</div>`
   ).join('');
   count.textContent = state.players.length;
+  const code = document.getElementById('room-code-display').textContent;
+  tvUpdate('lobby', { players: state.players, roomCode: code });
 }
 
 function renderWaitPlayers() {
@@ -1430,6 +1695,10 @@ function hostStartGame() {
   state.currentPromptIdx = 0;
 
   broadcastToAll({ type: 'game-start', settings, players: state.players });
+  if (state.gameSettings.hostDisplay) {
+    document.getElementById('host-display-btn').classList.add('visible');
+    openHostDisplay();
+  }
   hostNextPrompt();
 }
 
@@ -1481,6 +1750,7 @@ function checkAllAnswered() {
 }
 
 function hostStartVoting() {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   const prompt = state.prompts[state.currentPromptIdx];
   // Build answers list for voting (exclude own answer from voting)
   const answersArr = state.players.map(p => ({ playerId: p.id, answer: state.answers[p.id] || '(no answer)' }));
@@ -1582,6 +1852,7 @@ function startAnsweringPhase(prompt, round, promptIdx, totalPrompts) {
   document.getElementById('submit-answer-btn').style.display = 'block';
   document.getElementById('answer-submitted-msg').style.display = 'none';
   showScreen('screen-answer');
+  tvUpdate('answering', { prompt, round, promptIdx, totalPrompts, players: state.players, timerTotal: state.gameSettings?.answerTime || 60 });
 
   // Timer display
   const total = state.gameSettings?.answerTime || 60;
@@ -1621,6 +1892,7 @@ function submitAnswer() {
 
   if (state.isHost) {
     state.answers[state.myId] = answer;
+    trackAnswerForTV(state.myId);
     checkAllAnswered();
   } else {
     sendToHost({ type: 'answer', answer });
@@ -1634,26 +1906,39 @@ function startVotingPhase(prompt, answers, round, promptIdx, totalPrompts) {
   state.voteSubmitted = false;
   state.myVote = null;
 
+  const isBlind = state.gameSettings?.blindVoting;
+  const doReadAloud = state.gameSettings?.readAloud;
+
   document.getElementById('vote-round-badge').textContent = `ROUND ${round} · VOTE!`;
   document.getElementById('vote-prompt-text').textContent = prompt;
   document.getElementById('vote-submit-btn').style.display = 'block';
   document.getElementById('vote-submitted-msg').style.display = 'none';
 
-  // Render answers (can't vote for own)
+  // Blind badge
+  document.getElementById('blind-vote-badge').style.display = isBlind ? 'block' : 'none';
+
+  // Render answers — hide names if blind voting
   const list = document.getElementById('vote-answers-list');
-  list.innerHTML = answers.map(a => {
+  list.innerHTML = answers.map((a, idx) => {
     const isOwn = a.playerId === state.myId;
+    const player = state.players.find(p => p.id === a.playerId);
+    const nameHtml = isBlind
+      ? (isOwn ? '<span style="color:var(--muted);font-size:12px;">YOUR ANSWER</span>' : '')
+      : `<span style="color:var(--muted);font-size:12px;">${isOwn ? 'YOUR ANSWER' : (player?.name || '')}</span>`;
     return `
       <div class="answer-item ${isOwn ? 'own-answer' : ''}" 
            id="vote-opt-${a.playerId}"
            onclick="${isOwn ? 'notify("You can\'t vote for yourself!")' : `selectVote('${a.playerId}')`}">
         <span>${a.answer}</span>
-        ${isOwn ? '<span style="color:var(--muted);font-size:12px;">YOUR ANSWER</span>' : ''}
+        ${nameHtml}
       </div>
     `;
   }).join('');
 
   showScreen('screen-vote');
+
+  // Update TV display if open
+  tvUpdate('voting', { prompt, answers, players: state.players, isBlind, round, timerTotal: state.gameSettings?.voteTime || 30 });
 
   const total = state.gameSettings?.voteTime || 30;
   let t = total;
@@ -1663,9 +1948,15 @@ function startVotingPhase(prompt, answers, round, promptIdx, totalPrompts) {
     t--;
     document.getElementById('vote-timer').textContent = Math.max(0, t);
     document.getElementById('vote-timer-bar').style.width = (Math.max(0, t) / total * 100) + '%';
+    tvUpdateTimer('vote', t, total);
     if (t <= 0) clearInterval(ti);
   }, 1000);
   state.timerInterval = ti;
+
+  // Read answers aloud with TTS
+  if (doReadAloud && 'speechSynthesis' in window) {
+    readAnswersAloud(prompt, answers);
+  }
 }
 
 function selectVote(playerId) {
@@ -1679,6 +1970,9 @@ function selectVote(playerId) {
 function submitVote() {
   if (!state.myVote) { notify('Select an answer to vote for!'); return; }
   state.voteSubmitted = true;
+  // Stop TTS if still reading
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  document.getElementById('tts-indicator').style.display = 'none';
   document.getElementById('vote-submit-btn').style.display = 'none';
   document.getElementById('vote-submitted-msg').style.display = 'block';
 
@@ -1694,6 +1988,9 @@ function submitVote() {
 //  RESULTS PHASE
 // =====================================================
 function showResultsPhase(prompt, answers, votes, scores) {
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  const ttsBar = document.getElementById('tts-indicator');
+  if (ttsBar) ttsBar.style.display = 'none';
   document.getElementById('results-prompt-text').textContent = prompt;
 
   // Count votes per answer
@@ -1706,6 +2003,7 @@ function showResultsPhase(prompt, answers, votes, scores) {
     const vCount = voteCounts[a.playerId] || 0;
     const player = state.players.find(p => p.id === a.playerId);
     const isWinner = vCount === maxVotes && vCount > 0;
+    // Always reveal names in results, even after blind voting
     return `
       <div class="vote-option ${isWinner ? 'winning' : (vCount === 0 && maxVotes > 0 ? 'losing' : '')}">
         <div>${a.answer}</div>
@@ -1718,8 +2016,11 @@ function showResultsPhase(prompt, answers, votes, scores) {
 
   document.getElementById('results-next-area').style.display = state.isHost ? 'block' : 'none';
   document.getElementById('results-wait-area').style.display = state.isHost ? 'none' : 'block';
-  
+
   showScreen('screen-results');
+
+  // Update TV display with full results (names revealed)
+  tvUpdate('results', { prompt, answers, votes: voteCounts, players: state.players, maxVotes });
 }
 
 // =====================================================
@@ -1746,6 +2047,7 @@ function showScoreboardPhase(players, isHost) {
   document.getElementById('scoreboard-next-area').style.display = isHost ? 'block' : 'none';
   document.getElementById('scoreboard-wait-area').style.display = isHost ? 'none' : 'block';
   showScreen('screen-scoreboard');
+  tvUpdate('scoreboard', { players: sorted, round: state.currentRound });
 }
 
 // =====================================================
@@ -1769,6 +2071,7 @@ function showWinnerPhase(players) {
   `).join('');
 
   showScreen('screen-winner');
+  tvUpdate('winner', { players: sorted });
 }
 
 // =====================================================
@@ -1791,6 +2094,10 @@ function shuffle(arr) {
 
 function leaveGame() {
   clearTimer();
+  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  if (tvWindow && !tvWindow.closed) tvWindow.close();
+  tvWindow = null;
+  document.getElementById('host-display-btn').classList.remove('visible');
   if (state.peer) { state.peer.destroy(); state.peer = null; }
   state = {
     isHost: false, peer: null, connections: [], players: [], myId: null,
@@ -1822,8 +2129,246 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // =====================================================
-//  SOUND ENGINE (Web Audio API — no files needed)
+//  TV HOST DISPLAY ENGINE
 // =====================================================
+let tvWindow = null;
+
+function openHostDisplay() {
+  // Open a new window and render the TV display inside it using postMessage
+  tvWindow = window.open('', 'MarquipTV', 'width=1280,height=720,menubar=no,toolbar=no,location=no');
+  if (!tvWindow) { notify('Allow popups to use TV mode!'); return; }
+
+  tvWindow.document.write(`<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>MARQUIP — TV Display</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;600;700&display=swap');
+  :root {
+    --bg:#0d0d12;--surface:#16161f;--surface2:#1e1e2a;
+    --accent:#ff3f6c;--accent2:#ffcc00;--accent3:#00e5ff;
+    --text:#f0f0f5;--muted:#6a6a85;--border:#2a2a3a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;overflow:hidden;}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 40% at 20% 10%,rgba(255,63,108,0.08) 0%,transparent 60%),radial-gradient(ellipse 50% 40% at 80% 80%,rgba(0,229,255,0.06) 0%,transparent 60%);pointer-events:none;}
+  .wrap{max-width:1400px;margin:0 auto;padding:40px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+  .logo{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:4px;background:linear-gradient(135deg,#ff3f6c,#ffcc00,#00e5ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;filter:drop-shadow(0 0 20px rgba(255,63,108,0.3));}
+  .phase{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;color:var(--muted);margin:8px 0 20px;text-align:center;}
+  .prompt-box{background:var(--surface);border:2px solid var(--accent);border-radius:16px;padding:30px 40px;text-align:center;margin-bottom:24px;width:100%;max-width:1000px;font-size:clamp(22px,3vw,40px);font-weight:700;line-height:1.4;position:relative;}
+  .prompt-box::before{content:'"';position:absolute;top:-10px;left:14px;font-family:Georgia,serif;font-size:80px;color:rgba(255,63,108,0.12);line-height:1;}
+  .answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;width:100%;max-width:1200px;}
+  .answer-card{background:var(--surface);border:2px solid var(--border);border-radius:16px;padding:28px 22px;font-size:clamp(16px,2vw,26px);font-weight:600;line-height:1.4;text-align:center;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:all 0.5s ease;}
+  .answer-card.revealed{border-color:var(--accent3);background:rgba(0,229,255,0.06);}
+  .answer-card.winner{border-color:var(--accent2);background:rgba(255,204,0,0.08);box-shadow:0 0 50px rgba(255,204,0,0.2);}
+  .answer-card .pname{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:none;}
+  .answer-card.revealed .pname,.answer-card.winner .pname{display:block;color:var(--accent3);}
+  .answer-card.winner .pname{color:var(--accent2);}
+  .vcount{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--accent2);display:none;}
+  .answer-card.revealed .vcount,.answer-card.winner .vcount{display:block;}
+  .timer{font-family:'Bebas Neue',sans-serif;font-size:90px;color:var(--accent);line-height:1;margin:10px 0;}
+  .room-code{font-family:'Bebas Neue',sans-serif;font-size:80px;letter-spacing:14px;color:var(--accent2);margin:16px 0 6px;}
+  .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:20px;}
+  .chip{background:var(--surface2);border:1px solid var(--border);border-radius:100px;padding:10px 22px;font-size:18px;font-weight:600;}
+  .chip.done{border-color:var(--accent3);color:var(--accent3);}
+  .score-list{width:100%;max-width:700px;list-style:none;}
+  .score-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border);font-size:22px;}
+  .score-rank{font-family:'Bebas Neue',sans-serif;font-size:36px;width:50px;color:var(--muted);}
+  .score-rank.gold{color:var(--accent2)}.score-rank.silver{color:#c0c0c0}.score-rank.bronze{color:#cd7f32}
+  .score-pts{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent3);margin-left:auto;}
+  .winner-banner{font-family:'Bebas Neue',sans-serif;font-size:80px;background:linear-gradient(135deg,var(--accent2),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;text-align:center;}
+  .blind-badge{background:rgba(255,63,108,0.15);border:1px solid rgba(255,63,108,0.4);color:#ff3f6c;padding:4px 16px;border-radius:100px;font-size:13px;letter-spacing:1px;text-transform:uppercase;font-weight:600;margin-bottom:12px;display:inline-block;}
+</style>
+</head>
+<body>
+<div class="wrap"><div id="tv" style="width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;">
+  <div class="logo">MARQUIP</div>
+  <div class="phase">LOADING...</div>
+</div></div>
+<script>
+  window.addEventListener('message', (e) => {
+    if (e.data && e.data.marquipTV) render(e.data);
+  });
+  let timerInterval = null;
+  function render(data) {
+    const tv = document.getElementById('tv');
+    const { phase } = data;
+    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+    if (phase === 'lobby') {
+      tv.innerHTML = \`
+        <div class="logo">MARQUIP</div>
+        <div class="phase">WAITING FOR PLAYERS</div>
+        <div style="color:#6a6a85;font-size:18px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px;">Room Code</div>
+        <div class="room-code">\${data.roomCode}</div>
+        <div style="color:#6a6a85;font-size:14px;letter-spacing:1px;margin-bottom:20px;">Players joined: \${data.players.length}</div>
+        <div class="chips">\${data.players.map(p=>\`<div class="chip">\${p.name}</div>\`).join('')}</div>
+      \`;
+    } else if (phase === 'answering') {
+      let t = data.timerTotal || 60;
+      tv.innerHTML = \`
+        <div class="logo" style="font-size:32px;">MARQUIP</div>
+        <div class="phase">ROUND \${data.round} · ANSWER TIME</div>
+        <div class="prompt-box">\${data.prompt}</div>
+        <div class="timer" id="tv-timer">\${t}</div>
+        <div style="color:#6a6a85;font-size:15px;letter-spacing:1px;text-transform:uppercase;margin-bottom:12px;">Who's answered?</div>
+        <div class="chips" id="tv-chips">\${data.players.map(p=>\`<div class="chip" id="tv-chip-\${p.id}">\${p.name}</div>\`).join('')}</div>
+      \`;
+      timerInterval = setInterval(() => {
+        t--; const el = document.getElementById('tv-timer');
+        if (el) el.textContent = Math.max(0, t);
+        if (t <= 0) clearInterval(timerInterval);
+      }, 1000);
+    } else if (phase === 'chip-update') {
+      const chip = document.getElementById('tv-chip-' + data.playerId);
+      if (chip) chip.classList.add('done');
+    } else if (phase === 'voting') {
+      let t = data.timerTotal || 30;
+      tv.innerHTML = \`
+        <div class="logo" style="font-size:32px;">MARQUIP</div>
+        <div class="phase">VOTING</div>
+        \${data.isBlind ? '<div class="blind-badge">🕵️ Blind Voting</div>' : ''}
+        <div class="prompt-box" style="margin-bottom:16px;">\${data.prompt}</div>
+        <div class="timer" id="tv-timer">\${t}</div>
+        <div class="answers">\${data.answers.map(a => \`
+          <div class="answer-card">
+            <div>\${a.answer}</div>
+            \${!data.isBlind ? \`<div class="pname">\${data.players.find(p=>p.id===a.playerId)?.name||''}</div>\` : ''}
+          </div>
+        \`).join('')}</div>
+      \`;
+      timerInterval = setInterval(() => {
+        t--; const el = document.getElementById('tv-timer');
+        if (el) el.textContent = Math.max(0, t);
+        if (t <= 0) clearInterval(timerInterval);
+      }, 1000);
+    } else if (phase === 'results') {
+      tv.innerHTML = \`
+        <div class="logo" style="font-size:32px;">MARQUIP</div>
+        <div class="phase">RESULTS</div>
+        <div class="prompt-box" style="margin-bottom:16px;">\${data.prompt}</div>
+        <div class="answers">\${data.answers.map(a => {
+          const vc = data.votes[a.playerId] || 0;
+          const isW = vc === data.maxVotes && vc > 0;
+          const pname = data.players.find(p=>p.id===a.playerId)?.name || '';
+          return \`<div class="answer-card \${isW?'winner':'revealed'}">
+            <div>\${a.answer}</div>
+            <div class="pname">\${pname}</div>
+            <div class="vcount">\${vc}</div>
+            <div style="font-size:13px;color:#6a6a85;">\${vc===1?'vote':'votes'}</div>
+          </div>\`;
+        }).join('')}</div>
+      \`;
+    } else if (phase === 'scoreboard') {
+      const ranks = ['gold','silver','bronze'];
+      tv.innerHTML = \`
+        <div class="logo" style="font-size:40px;">MARQUIP</div>
+        <div class="phase">LEADERBOARD · AFTER ROUND \${data.round}</div>
+        <ul class="score-list">\${data.players.map((p,i)=>\`
+          <li class="score-item">
+            <div class="score-rank \${ranks[i]||''}">\${i+1}</div>
+            <div style="flex:1;font-weight:600;">\${p.name}</div>
+            <div class="score-pts">\${p.score}</div>
+          </li>
+        \`).join('')}</ul>
+      \`;
+    } else if (phase === 'winner') {
+      const w = data.players[0];
+      const ranks = ['gold','silver','bronze'];
+      tv.innerHTML = \`
+        <div class="logo">MARQUIP</div>
+        <div style="font-size:40px;margin:10px 0;">🎉🏆🎉</div>
+        <div class="winner-banner">🏆 \${w.name} WINS!</div>
+        <div style="color:#6a6a85;font-size:22px;margin:8px 0 24px;">\${w.score} points</div>
+        <ul class="score-list">\${data.players.map((p,i)=>\`
+          <li class="score-item">
+            <div class="score-rank \${ranks[i]||''}">\${i+1}</div>
+            <div style="flex:1;font-weight:600;">\${p.name}</div>
+            <div class="score-pts">\${p.score}</div>
+          </li>
+        \`).join('')}</ul>
+      \`;
+    }
+  }
+<\/script>
+</body>
+</html>`);
+  tvWindow.document.close();
+  notify('📺 TV Display opened!');
+}
+
+function tvUpdate(phase, data) {
+  if (!tvWindow || tvWindow.closed) return;
+  tvWindow.postMessage({ marquipTV: true, phase, ...data }, '*');
+}
+
+function tvUpdateTimer(type, t, total) {
+  // No-op — timers are managed inside the TV window itself
+}
+
+// Also push answer chip updates to TV when answers come in
+const __tvOrigCheckAllAnswered = checkAllAnswered;
+// We'll patch answer tracking to update TV chips
+function trackAnswerForTV(playerId) {
+  tvUpdate('chip-update', { playerId });
+}
+
+// =====================================================
+//  TEXT-TO-SPEECH — READ ANSWERS ALOUD
+// =====================================================
+function readAnswersAloud(prompt, answers) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+
+  const ttsBar = document.getElementById('tts-indicator');
+  const ttsText = document.getElementById('tts-reading-text');
+  ttsBar.style.display = 'block';
+
+  // Pick a voice — prefer a clear English one
+  const getVoice = () => {
+    const voices = window.speechSynthesis.getVoices();
+    return voices.find(v => v.lang.startsWith('en') && v.localService) ||
+           voices.find(v => v.lang.startsWith('en')) ||
+           voices[0] || null;
+  };
+
+  const speakSequence = (items, idx) => {
+    if (idx >= items.length) {
+      ttsBar.style.display = 'none';
+      return;
+    }
+    const { text, label } = items[idx];
+    const utt = new SpeechSynthesisUtterance(text);
+    utt.rate = 0.92;
+    utt.pitch = 1.05;
+    const v = getVoice();
+    if (v) utt.voice = v;
+    if (ttsText) ttsText.textContent = label;
+    utt.onend = () => setTimeout(() => speakSequence(items, idx + 1), 400);
+    utt.onerror = () => speakSequence(items, idx + 1);
+    window.speechSynthesis.speak(utt);
+  };
+
+  // Build speech items: prompt first, then each answer
+  const items = [
+    { text: `The prompt is: ${prompt}`, label: `Reading prompt...` },
+    ...answers.map((a, i) => ({
+      text: `Answer ${i + 1}: ${a.answer}`,
+      label: `Reading answer ${i + 1} of ${answers.length}...`
+    }))
+  ];
+
+  // Small delay to let screen transition finish
+  setTimeout(() => {
+    if (window.speechSynthesis.getVoices().length === 0) {
+      window.speechSynthesis.onvoiceschanged = () => speakSequence(items, 0);
+    } else {
+      speakSequence(items, 0);
+    }
+  }, 600);
+}
+
+
 const SFX = (() => {
   let ctx = null;
   let muted = false;
