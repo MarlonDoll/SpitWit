@@ -962,10 +962,11 @@
 
         <label>Prompt Pack</label>
         <select id="prompt-pack">
-          <option value="all">🌈 Everything (All 300+ Prompts)</option>
+          <option value="all">🌈 Everything (All 400+ Prompts)</option>
           <option value="party">🎉 Party Vibes</option>
           <option value="dark">🌑 Dark Humor</option>
           <option value="wholesome">☀️ Wholesome</option>
+          <option value="personalized">👤 Personalized (All About You)</option>
           <option value="custom-only">✏️ My Custom Prompts Only</option>
         </select>
 
@@ -1585,6 +1586,108 @@ const ALL_PROMPTS = [
   "The worst possible motivational quote on a gym wall",
   "A terrible sequel to a beloved game show",
   "What would happen if every meeting that could have been an email became a puppet show instead",
+  // BATCH 2 — 100 NEW PROMPTS
+  "The least intimidating gang name",
+  "A terrible slogan for a funeral livestream service",
+  "What your Uber driver actually thinks when you give 4 stars",
+  "The most passive-aggressive way to say you're fine",
+  "A bad reason to get a tattoo",
+  "What office printers are plotting",
+  "The worst thing to shout at a library",
+  "A rejected tagline for a water brand",
+  "What happens at the world's most boring heist",
+  "The worst possible ringtone for a job interview",
+  "A terrible name for a true crime podcast",
+  "What your Netflix algorithm knows about you that you don't",
+  "The least motivating gym name",
+  "A bad plot twist in a cooking competition",
+  "What escalator handrails think about all day",
+  "The worst thing to say while cutting someone's hair",
+  "A terrible reason to go on a reality dating show",
+  "What would happen if hiccups had a purpose",
+  "The most cursed thing to find in an Airbnb",
+  "A bad reason to start a neighborhood watch",
+  "What a lonely ATM thinks at 3AM",
+  "The worst surprise in a birthday cake",
+  "A terrible job for someone with no patience",
+  "What shopping mall food courts are actually serving",
+  "The most uncomfortable conversation to overhear in an elevator",
+  "A bad reason to move to another country",
+  "What happens when you let autocorrect write your wedding vows",
+  "The least romantic romantic comedy plot",
+  "A terrible mascot for a hospital",
+  "What hotel pillows have witnessed",
+  "The worst reason to call your ex",
+  "A bad name for a true crime documentary",
+  "What would happen if apologies had expiration dates",
+  "The most suspicious thing to order at a fast food drive-through at midnight",
+  "A terrible name for a twins",
+  "What the 'reply all' button would say if it could feel regret",
+  "The worst theme for a gender reveal",
+  "A bad reason to become a life coach",
+  "What your shadow does when you're not looking",
+  "The most overdressed occasion you could attend",
+  "A terrible warning label for a motivational book",
+  "What happens when a ghost can't figure out why they're still haunting",
+  "The most suspicious reason to cancel plans",
+  "A bad name for a luxury car",
+  "What the last piece of office birthday cake thinks",
+  "The worst possible class field trip destination",
+  "A terrible slogan for a mattress company",
+  "What would happen if texting was replaced with interpretive dance",
+  "The most anticlimactic thing to go to jail for",
+  "A bad name for a children's cartoon",
+  "What a weather app actually thinks about you constantly checking it",
+  "The worst possible way to announce you're vegan",
+  "A terrible addition to the school curriculum",
+  "What traffic jams are actually for",
+  "The most unnecessary product ever invented",
+  "A bad reason to challenge someone to a duel",
+  "What staplers say behind scissors' back",
+  "The worst place to have an epiphany",
+  "A terrible reason to learn a musical instrument",
+  "What ice cubes think as they slowly melt",
+  "The most unsettling children's song you could write",
+  "A bad excuse for forgetting someone's name",
+  "What happens in the waiting room of the afterlife",
+  "The worst thing your smart home device could say",
+  "A terrible name for a bakery",
+  "What paint watches people do in their homes",
+  "The most politely devastating rejection letter",
+  "A bad alternative to shaking hands",
+  "What would happen if every compliment had a disclaimer",
+  "The least impressive magic show",
+  "A terrible reason to move to a different seat on a plane",
+  "What a to-do list thinks of its creator",
+  "The worst hashtag to trend",
+  "A bad name for a streaming service",
+  "What would happen if people had to narrate their own lives out loud",
+  "The most unnecessary disclaimer",
+  "A terrible plot for a Pixar movie",
+  "What vending machine D7 thinks about never being chosen",
+  "The worst way to break the news you're moving away",
+  "A bad reason to write a strongly worded letter",
+  "What happens at the annual conference for forgotten passwords",
+  "The most suspicious thing to keep in your car",
+  "A terrible name for a detective agency",
+  "What a Wikipedia article thinks about being edited at 2AM",
+  "The worst way to describe your job at a party",
+  "A bad reason to knock on a stranger's door",
+  "What would happen if procrastination was an Olympic sport",
+  "The least effective battle cry",
+  "A terrible icebreaker for a job interview",
+  "What your immune system says when you finally get a good night's sleep",
+  "The worst possible way to say 'I love you' for the first time",
+  "A bad name for a chain of hotels",
+  "What happens when a motivational speaker loses all motivation",
+  "The most suspicious LinkedIn endorsement",
+  "A terrible reason to start a fire",
+  "What the snooze button thinks every morning",
+  "The worst possible thing to say in a job resignation letter",
+  "A bad name for a new country founded in your backyard",
+  "What would happen if every excuse you made became publicly visible",
+  "The most unnecessary celebrity beef",
+  "A terrible slogan for a dentist who just found out they hate teeth",
 ];
 
 // Remove duplicates just in case
@@ -1623,23 +1726,120 @@ const PERSONAL_PROMPT_TEMPLATES = [
   "What [A] would write in their Yelp review of heaven",
   "The most [A] thing [A] has ever done",
   "What [A] brings to every potluck no matter what",
+  "The hobby [A] picked up during lockdown that they pretend they still do",
+  "What [A]'s pet would say about them in a court of law",
+  "The conspiracy theory [A] secretly believes",
+  "What [A] says vs what [A] means",
+  "The career [A] would have in a medieval village",
+  "What [A] would rename themselves if they could",
+  "The most [A]-coded purchase ever made on Amazon",
+  "What [A] is doing right now instead of being productive",
+  "The thing [A] knows way too much about for no reason",
+  "What [A] and [B]'s buddy cop movie would be called",
+  "The most likely reason [A] has been blocked by someone",
+  "What [A] thinks about during an awkward silence",
+  "The talent show act [A] has been quietly rehearsing",
+  "What [A]'s autobiography would be titled",
+  "The era of history [A] would thrive in",
+  "What [A] definitely Googled after leaving this room",
+  "The most suspicious item on [A]'s grocery list",
+  "What [A]'s sleep paralysis demon looks like",
+  "The most passive-aggressive gift [A] has ever given",
+  "What [A] would do if they were invisible for a day",
+  "The reason [A] and [B] would get kicked off a game show",
+  "What [A]'s spirit animal says behind their back",
+  "The world record [A] could probably break without trying",
+  "What [A] argues about with strangers on the internet",
+  "The thing [A] does that they think nobody notices",
+  "What [A]'s warning label would say",
+  "The fake name [A] gives at Starbucks and why",
+  "What [A] is the patron saint of",
+  "The documentary Netflix would make about [A]",
+  "What [A] would say as their last words, and why it'd be embarrassing",
+  "The secret talent [A] definitely has but refuses to admit",
 ];
 
 function generatePersonalPrompts(players) {
   if (players.length < 2) return [];
   const names = players.map(p => p.name);
-  const result = [];
-  // Shuffle templates and generate ~20% of total prompts as personal
-  const shuffled = [...PERSONAL_PROMPT_TEMPLATES].sort(() => Math.random() - 0.5);
-  shuffled.forEach(template => {
-    // Pick two different random players
+  const shuffledTemplates = [...PERSONAL_PROMPT_TEMPLATES].sort(() => Math.random() - 0.5);
+  return shuffledTemplates.map(template => {
     const a = names[Math.floor(Math.random() * names.length)];
     let b = names[Math.floor(Math.random() * names.length)];
-    while (b === a && names.length > 1) b = names[Math.floor(Math.random() * names.length)];
-    const prompt = template.replace(/\[A\]/g, a).replace(/\[B\]/g, b);
-    result.push(prompt);
+    let attempts = 0;
+    while (b === a && names.length > 1 && attempts++ < 10) b = names[Math.floor(Math.random() * names.length)];
+    return template.replace(/\[A\]/g, a).replace(/\[B\]/g, b);
   });
+}
+
+// Build a personalized prompt list that guarantees every player is featured
+// at least once per round before anyone is repeated
+function buildPersonalizedPool(players, totalPromptsNeeded) {
+  const names = players.map(p => p.name);
+  const result = [];
+
+  // Group templates by whether they use [B] or just [A]
+  const soloTemplates = PERSONAL_PROMPT_TEMPLATES.filter(t => !t.includes('[B]'));
+  const duoTemplates  = PERSONAL_PROMPT_TEMPLATES.filter(t =>  t.includes('[B]'));
+
+  // We cycle through players in shuffled order, ensuring each gets featured
+  // before anyone repeats — like dealing cards
+  const shuffledTemplates = [...PERSONAL_PROMPT_TEMPLATES].sort(() => Math.random() - 0.5);
+
+  let templateIdx = 0;
+  let playerQueue = []; // replenished when empty
+
+  const nextPlayer = (exclude) => {
+    if (!playerQueue.length) playerQueue = [...names].sort(() => Math.random() - 0.5);
+    // make sure we don't immediately repeat the excluded name
+    if (exclude && playerQueue[0] === exclude && playerQueue.length > 1) {
+      playerQueue.push(playerQueue.shift());
+    }
+    return playerQueue.shift();
+  };
+
+  while (result.length < totalPromptsNeeded) {
+    if (templateIdx >= shuffledTemplates.length) {
+      // reshuffle and reuse if we need more prompts than templates
+      shuffledTemplates.sort(() => Math.random() - 0.5);
+      templateIdx = 0;
+    }
+    const template = shuffledTemplates[templateIdx++];
+    const a = nextPlayer(null);
+    const b = nextPlayer(a);
+    result.push(template.replace(/\[A\]/g, a).replace(/\[B\]/g, b));
+  }
+
   return result;
+}
+
+// Interleave personal prompts into a regular pool so that within each round's
+// prompts, each player is featured at least once before any repeat
+function interleavePersonal(regularPool, personalPool, promptsPerRound, numPlayers) {
+  // How many personal prompts fit per round (at most all slots, at least 1 per player)
+  const personalPerRound = Math.min(promptsPerRound, numPlayers);
+  const regularPerRound  = promptsPerRound - personalPerRound;
+
+  const shuffledRegular  = [...regularPool].sort(() => Math.random() - 0.5);
+  const combined = [];
+  let regIdx = 0;
+  let perIdx = 0;
+
+  // We don't know total rounds yet, just build enough for a generous pool
+  const rounds = Math.ceil(shuffledRegular.length / Math.max(1, regularPerRound));
+  for (let r = 0; r < rounds && perIdx < personalPool.length; r++) {
+    // Add personal prompts for this round
+    for (let i = 0; i < personalPerRound && perIdx < personalPool.length; i++) {
+      combined.push(personalPool[perIdx++]);
+    }
+    // Fill remaining slots with regular prompts
+    for (let i = 0; i < regularPerRound && regIdx < shuffledRegular.length; i++) {
+      combined.push(shuffledRegular[regIdx++]);
+    }
+  }
+  // Append any leftover regular prompts
+  while (regIdx < shuffledRegular.length) combined.push(shuffledRegular[regIdx++]);
+  return combined;
 }
 
 // =====================================================
@@ -1988,7 +2188,28 @@ function hostStartGame() {
   
   // Build prompt pool
   const settings = state.gameSettings;
+  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
+  const totalPromptsNeeded = settings.rounds * promptsPerRound;
+
   let pool;
+  if (settings.promptPack === 'personalized') {
+    // Full personalized mode: every prompt features a player, guaranteed round-robin coverage
+    pool = buildPersonalizedPool(state.players, totalPromptsNeeded);
+    shuffle(pool);
+    state.prompts = pool.slice(0, totalPromptsNeeded);
+    state.totalRounds = settings.rounds;
+    state.currentRound = 0;
+    state.currentPromptIdx = 0;
+    state.recap = [];
+    broadcastToAll({ type: 'game-start', settings, players: state.players });
+    if (state.gameSettings.hostDisplay) {
+      document.getElementById('host-display-btn').classList.add('visible');
+      openHostDisplay();
+    }
+    hostNextPrompt();
+    return;
+  }
+
   if (settings.promptPack === 'all') pool = [...UNIQUE_PROMPTS];
   else if (settings.promptPack === 'custom-only') pool = [...(settings.customPrompts || [])];
   else pool = [...(PROMPT_PACKS[settings.promptPack] || UNIQUE_PROMPTS)];
@@ -1997,18 +2218,17 @@ function hostStartGame() {
     pool = [...pool, ...settings.customPrompts];
   }
 
-  // Inject personal prompts (targeting ~25% of the pool)
+  // Inject personal prompts — guarantee each player featured at least once per round
   if (settings.personalPrompts && state.players.length >= 2) {
-    const personalPool = generatePersonalPrompts(state.players);
-    const targetPersonal = Math.max(2, Math.ceil(settings.rounds * 0.5));
-    const toAdd = personalPool.slice(0, targetPersonal);
-    pool = [...pool, ...toAdd];
+    // Build enough personal prompts to cover one per player per round
+    const personalNeeded = settings.rounds * state.players.length;
+    const personalPool = buildPersonalizedPool(state.players, personalNeeded);
+    // Shuffle and interleave: put one personal prompt every N slots
+    pool = interleavePersonal(pool, personalPool, promptsPerRound, state.players.length);
   }
 
-  // Shuffle and pick
   shuffle(pool);
-  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
-  state.prompts = pool.slice(0, settings.rounds * promptsPerRound);
+  state.prompts = pool.slice(0, totalPromptsNeeded);
   state.totalRounds = settings.rounds;
   state.currentRound = 0;
   state.currentPromptIdx = 0;
