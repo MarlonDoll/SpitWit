@@ -450,9 +450,57 @@
   .confetti-piece { position: fixed; pointer-events: none; z-index: 9998; top: -20px; animation: confettiFall linear forwards; }
   @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(110vh) rotate(820deg); opacity: 0; } }
 
+  /* ===== HOME SCREEN CHOICE CARDS ===== */
+  .home-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .choice-card {
+    background: var(--surface);
+    border: 2.5px solid var(--border-thick);
+    border-top-width: 5px;
+    border-radius: 20px;
+    padding: 40px 20px 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 5px 5px 0 var(--border-thick);
+    font-family: var(--font-body);
+    width: 100%;
+  }
+  .choice-host { border-color: var(--accent); box-shadow: 5px 5px 0 rgba(255,71,87,0.45); }
+  .choice-host:hover { background: rgba(255,71,87,0.07); transform: translate(-3px,-3px); box-shadow: 8px 8px 0 rgba(255,71,87,0.45); }
+  .choice-join { border-color: var(--accent3); box-shadow: 5px 5px 0 rgba(168,255,62,0.38); }
+  .choice-join:hover { background: rgba(168,255,62,0.06); transform: translate(-3px,-3px); box-shadow: 8px 8px 0 rgba(168,255,62,0.38); }
+  .choice-card:active { transform: translate(2px,2px) !important; box-shadow: 2px 2px 0 var(--border-thick) !important; }
+  .choice-icon { font-size: 52px; display: block; line-height: 1; margin-bottom: 4px; }
+  .choice-title { font-family: var(--font-display); font-size: 40px; display: block; letter-spacing: 2px; }
+  .choice-host .choice-title { color: var(--accent); text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
+  .choice-join .choice-title { color: var(--accent3); text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
+  .choice-sub { font-size: 13px; color: var(--muted); font-weight: 700; display: block; line-height: 1.4; }
+
+  /* ===== LIVE TIME ESTIMATE ===== */
+  .time-estimate {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px;
+    background: rgba(255,211,42,0.07);
+    border: 2px solid rgba(255,211,42,0.25);
+    border-radius: var(--radius);
+    margin-bottom: 12px;
+    font-size: 13px; font-weight: 700; color: var(--accent2);
+  }
+
   /* ===== ACCESSIBILITY ===== */
   @media (prefers-reduced-motion: reduce) {
     .bg-blob, .logo, .timer-text.urgent, .vote-option.winning, .answer-item, .score-item, .confetti-piece, .doodle-bg span { animation: none !important; transition: none !important; }
+  }
+
+  @media(max-width: 500px) {
+    .home-choices { grid-template-columns: 1fr; }
+    .choice-card { padding: 28px 16px 24px; }
+    .choice-icon { font-size: 40px; }
+    .choice-title { font-size: 32px; }
   }
 </style>
 </head>
@@ -472,9 +520,17 @@
     <div class="logo-wrap"><span class="logo">SPITWIT</span></div>
     <p class="tagline">The Party Answer Game · 2–32 Players</p>
 
-    <div class="card">
-      <button class="btn btn-primary" onclick="window.showScreen('screen-host-setup')">🎮 HOST A GAME</button>
-      <button class="btn btn-secondary" onclick="window.showScreen('screen-join')">🔗 JOIN A GAME</button>
+    <div class="home-choices">
+      <button class="choice-card choice-host" onclick="window.showScreen('screen-host-setup')">
+        <span class="choice-icon">🎮</span>
+        <span class="choice-title">HOST</span>
+        <span class="choice-sub">Create a room &amp; invite friends</span>
+      </button>
+      <button class="choice-card choice-join" onclick="window.showScreen('screen-join')">
+        <span class="choice-icon">🔗</span>
+        <span class="choice-title">JOIN</span>
+        <span class="choice-sub">Got a room code? Tap here</span>
+      </button>
     </div>
 
     <div class="card">
@@ -509,9 +565,9 @@
 
         <label>Number of Rounds</label>
         <select id="num-rounds">
-          <option value="3">3 Rounds (Quick ~15 min)</option>
-          <option value="5" selected>5 Rounds (Standard ~25 min)</option>
-          <option value="7">7 Rounds (Extended ~40 min)</option>
+          <option value="3">3 Rounds (Quick)</option>
+          <option value="5" selected>5 Rounds (Standard)</option>
+          <option value="7">7 Rounds (Extended)</option>
           <option value="10">10 Rounds (Marathon)</option>
         </select>
 
@@ -525,10 +581,12 @@
 
         <label>Voting Time Limit</label>
         <select id="vote-time">
-          <option value="20">20 Seconds</option>
-          <option value="30" selected>30 Seconds</option>
+          <option value="20" selected>20 Seconds</option>
+          <option value="30">30 Seconds</option>
           <option value="45">45 Seconds</option>
         </select>
+
+        <div class="time-estimate" id="time-estimate">⏱ Estimated game time updates as you change settings</div>
 
         <label>Prompt Pack</label>
         <select id="prompt-pack">
@@ -550,7 +608,7 @@
         <div style="font-family:var(--font-display);font-size:18px;letter-spacing:2px;color:var(--accent2);margin-bottom:12px;">EXTRA FEATURES</div>
 
         <label class="setting-toggle">
-          <input type="checkbox" id="blind-voting">
+          <input type="checkbox" id="blind-voting" checked>
           <div class="setting-toggle-label">
             <strong>🕵️ Blind Voting</strong>
             <span>Answers are shown without player names during voting — revealed only at results</span>
