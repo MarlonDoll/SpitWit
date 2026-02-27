@@ -10,8 +10,8 @@ import { startAnsweringPhase, startVotingPhase, showResultsPhase,
 import { broadcastToAll, sendToHost, sendReliable } from './network.js';
 
 export function hostStartGame() {
-  if (state.players.filter(p => !p.disconnected).length < 2) {
-    alert('Need at least 2 players!'); return;
+  if (state.players.filter(p => !p.disconnected).length < 1) {
+    alert('Need at least 1 player!'); return;
   }
 
   SFX.gameStart();

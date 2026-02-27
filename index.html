@@ -7,7 +7,7 @@
 <!-- defer allows the page to render immediately while PeerJS loads in the background -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js" defer></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&display=swap');
 
   :root {
     --bg: #0e0b1a;
@@ -22,7 +22,7 @@
     --border: #2e2650;
     --border-thick: #3d3570;
     --radius: 14px;
-    --font-display: 'Boogaloo', cursive;
+    --font-display: 'Fredoka One', cursive;
     --font-body: 'Nunito', sans-serif;
     --ink: #1a0a3e;
   }
@@ -110,6 +110,16 @@
     text-align: center;
     position: relative;
     margin-bottom: 4px;
+  }
+
+  /* ===== SPEECH BUBBLE SVG LOGO ===== */
+  .logo-svg {
+    width: 100%;
+    max-width: 600px;
+    display: block;
+    margin: 0 auto;
+    animation: logoFloat 7s ease-in-out infinite;
+    overflow: visible;
   }
 
   .logo-wrap::before {
@@ -295,8 +305,8 @@
     line-height: 1.4;
     box-shadow: 3px 3px 0 var(--border-thick);
   }
-  .vote-option:hover { border-color: var(--accent); transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--accent); }
-  .vote-option.selected { border-color: var(--accent2); background: rgba(255,211,42,0.1); box-shadow: 4px 4px 0 var(--accent2); transform: translate(-2px, -2px); }
+  .vote-option:hover { border-color: var(--accent); transform: translate(-2px, -2px) rotate(var(--vote-tilt,0deg)); box-shadow: 5px 5px 0 var(--accent); }
+  .vote-option.selected { border-color: var(--accent2); background: rgba(255,211,42,0.1); box-shadow: 4px 4px 0 var(--accent2); transform: translate(-2px, -2px) rotate(var(--vote-tilt,0deg)); }
   .vote-option.winning { border-color: var(--accent3); background: rgba(168,255,62,0.12); box-shadow: 4px 4px 0 var(--accent3), 0 0 28px rgba(168,255,62,0.25); animation: winCelebrate 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both, winnerGlow 2s ease-in-out 0.55s infinite alternate; }
   @keyframes winCelebrate { 0% { transform: scale(0.93) translateY(6px); opacity: 0.6; } 60% { transform: scale(1.06) translateY(-6px) translate(-2px,-2px); } 100% { transform: scale(1.02) translateY(-3px) translate(-2px,-2px); } }
   @keyframes winnerGlow { from { box-shadow: 4px 4px 0 var(--accent3), 0 0 20px rgba(168,255,62,0.2); } to { box-shadow: 4px 4px 0 var(--accent3), 0 0 45px rgba(168,255,62,0.45); } }
@@ -338,8 +348,8 @@
     font-weight: 700;
     box-shadow: 3px 3px 0 var(--border-thick);
   }
-  .answer-item:hover { border-color: var(--accent); transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--accent); }
-  .answer-item.selected { border-color: var(--accent2); background: rgba(255,211,42,0.08); box-shadow: 4px 4px 0 var(--accent2); transform: translate(-2px,-2px); }
+  .answer-item:hover { border-color: var(--accent); transform: translate(-2px,-2px) rotate(var(--tilt,0deg)); box-shadow: 5px 5px 0 var(--accent); }
+  .answer-item.selected { border-color: var(--accent2); background: rgba(255,211,42,0.08); box-shadow: 4px 4px 0 var(--accent2); transform: translate(-2px,-2px) rotate(var(--tilt,0deg)); }
 
   .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--surface2); border-radius: var(--radius); padding: 4px; border: 2px solid var(--border-thick); }
   .tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 800; color: var(--muted); transition: all 0.2s; letter-spacing: 1px; text-transform: uppercase; border: none; background: none; font-family: var(--font-body); }
@@ -441,8 +451,8 @@
   .timer-bar.urgent { background: linear-gradient(90deg, #ff2d3b, var(--accent), #ff6b35) !important; }
 
   /* ===== CARD ENTRANCE ANIMATIONS ===== */
-  @keyframes slideInCard { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
-  .answer-item { animation: slideInCard 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+  @keyframes slideInCard { from { opacity: 0; transform: translateY(14px) scale(0.96) rotate(0deg); } to { opacity: 1; transform: translateY(0) scale(1) rotate(var(--tilt,0deg)); } }
+  .answer-item { transform: rotate(var(--tilt, 0deg)); animation: slideInCard 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
   @keyframes scoreSlideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
   .score-item { animation: scoreSlideIn 0.3s ease backwards; }
 
@@ -469,11 +479,12 @@
     font-family: var(--font-body);
     width: 100%;
   }
-  .choice-host { border-color: var(--accent); box-shadow: 5px 5px 0 rgba(255,71,87,0.45); }
-  .choice-host:hover { background: rgba(255,71,87,0.07); transform: translate(-3px,-3px); box-shadow: 8px 8px 0 rgba(255,71,87,0.45); }
-  .choice-join { border-color: var(--accent3); box-shadow: 5px 5px 0 rgba(168,255,62,0.38); }
-  .choice-join:hover { background: rgba(168,255,62,0.06); transform: translate(-3px,-3px); box-shadow: 8px 8px 0 rgba(168,255,62,0.38); }
-  .choice-card:active { transform: translate(2px,2px) !important; box-shadow: 2px 2px 0 var(--border-thick) !important; }
+  .choice-host { border-color: var(--accent); box-shadow: 5px 5px 0 rgba(255,71,87,0.45); --choice-tilt: -2deg; }
+  .choice-host:hover { background: rgba(255,71,87,0.07); transform: translate(-3px,-3px) rotate(-2deg); box-shadow: 8px 8px 0 rgba(255,71,87,0.45); }
+  .choice-join { border-color: var(--accent3); box-shadow: 5px 5px 0 rgba(168,255,62,0.38); --choice-tilt: 1.5deg; }
+  .choice-join:hover { background: rgba(168,255,62,0.06); transform: translate(-3px,-3px) rotate(1.5deg); box-shadow: 8px 8px 0 rgba(168,255,62,0.38); }
+  .choice-card { transform: rotate(var(--choice-tilt, 0deg)); }
+  .choice-card:active { transform: translate(2px,2px) rotate(var(--choice-tilt, 0deg)) !important; box-shadow: 2px 2px 0 var(--border-thick) !important; }
   .choice-icon { font-size: 52px; display: block; line-height: 1; margin-bottom: 4px; }
   .choice-title { font-family: var(--font-display); font-size: 40px; display: block; letter-spacing: 2px; }
   .choice-host .choice-title { color: var(--accent); text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
@@ -491,9 +502,22 @@
     font-size: 13px; font-weight: 700; color: var(--accent2);
   }
 
+  /* ===== CARD TILTS ===== */
+  .answer-item:nth-child(1) { --tilt: -1.4deg; }
+  .answer-item:nth-child(2) { --tilt: 0.9deg; }
+  .answer-item:nth-child(3) { --tilt: -0.7deg; }
+  .answer-item:nth-child(4) { --tilt: 1.6deg; }
+  .answer-item:nth-child(5) { --tilt: -1.1deg; }
+  .answer-item:nth-child(6) { --tilt: 0.5deg; }
+  .vote-option:nth-child(1) { --vote-tilt: 1deg; transform: rotate(1deg); }
+  .vote-option:nth-child(2) { --vote-tilt: -0.7deg; transform: rotate(-0.7deg); }
+  .vote-option:nth-child(3) { --vote-tilt: -1.2deg; transform: rotate(-1.2deg); }
+  .vote-option:nth-child(4) { --vote-tilt: 0.8deg; transform: rotate(0.8deg); }
+
   /* ===== ACCESSIBILITY ===== */
   @media (prefers-reduced-motion: reduce) {
-    .bg-blob, .logo, .timer-text.urgent, .vote-option.winning, .answer-item, .score-item, .confetti-piece, .doodle-bg span { animation: none !important; transition: none !important; }
+    .bg-blob, .logo, .logo-svg, .timer-text.urgent, .vote-option.winning, .answer-item, .score-item, .confetti-piece, .doodle-bg span { animation: none !important; transition: none !important; }
+    .answer-item, .vote-option, .choice-card { transform: none !important; }
   }
 
   @media(max-width: 500px) {
@@ -517,7 +541,28 @@
 <!-- ===== HOME SCREEN ===== -->
 <div id="screen-home" class="screen active">
   <div class="container" style="padding-top: 60px;">
-    <div class="logo-wrap"><span class="logo">SPITWIT</span></div>
+    <div class="logo-wrap">
+      <svg class="logo-svg" viewBox="0 0 640 215" xmlns="http://www.w3.org/2000/svg" aria-label="SPITWIT" role="img">
+        <!-- Ink depth shadow -->
+        <path transform="translate(7,7)"
+          d="M 44 8 L 596 8 Q 632 8 632 44 L 632 127 Q 632 163 596 163 L 180 163 L 100 207 L 60 163 L 44 163 Q 8 163 8 127 L 8 44 Q 8 8 44 8 Z"
+          fill="#1a0a3e"/>
+        <!-- Bubble fill + border -->
+        <path
+          d="M 44 8 L 596 8 Q 632 8 632 44 L 632 127 Q 632 163 596 163 L 180 163 L 100 207 L 60 163 L 44 163 Q 8 163 8 127 L 8 44 Q 8 8 44 8 Z"
+          fill="#17132a" stroke="#1a0a3e" stroke-width="5" stroke-linejoin="round"/>
+        <!-- SPITWIT text -->
+        <text x="320" y="88"
+          font-family="'Fredoka One', cursive"
+          font-size="115"
+          fill="#ffd32a"
+          stroke="#1a0a3e"
+          stroke-width="8"
+          paint-order="stroke fill"
+          text-anchor="middle"
+          dominant-baseline="central">SPITWIT</text>
+      </svg>
+    </div>
     <p class="tagline">The Party Answer Game · 2–32 Players</p>
 
     <div class="home-choices">
