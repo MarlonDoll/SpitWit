@@ -147,12 +147,12 @@
   .tagline {
     text-align: center;
     color: var(--muted);
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    margin-top: 4px;
-    margin-bottom: 36px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    margin-top: 8px;
+    margin-bottom: 28px;
+    line-height: 1.6;
   }
 
   .card {
@@ -213,6 +213,10 @@
   .btn-cyan { background: linear-gradient(135deg, #c8ff6e 0%, var(--accent3) 65%); color: var(--ink); font-weight: 800; border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
   .btn-cyan:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
   .btn-cyan:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
+
+  .btn-outline { background: transparent; color: var(--accent2); border-color: var(--accent2); box-shadow: none; }
+  .btn-outline:hover { background: rgba(255,211,42,0.08); transform: translate(-2px,-2px); box-shadow: 4px 4px 0 rgba(255,211,42,0.35); }
+  .btn-outline:active { transform: translate(2px,2px); box-shadow: none; }
 
   .btn-sm { padding: 8px 16px; font-size: 16px; margin-bottom: 0; width: auto; letter-spacing: 0.5px; box-shadow: 3px 3px 0 var(--ink); }
   .btn-sm:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
@@ -460,40 +464,22 @@
   .confetti-piece { position: fixed; pointer-events: none; z-index: 9998; top: -20px; animation: confettiFall linear forwards; }
   @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(110vh) rotate(820deg); opacity: 0; } }
 
-  /* ===== HOME SCREEN CHOICE CARDS ===== */
-  .home-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
-  .choice-card {
-    background: var(--surface);
-    border: 2.5px solid var(--border-thick);
-    border-top-width: 4px;
-    border-radius: 18px;
-    padding: 22px 16px 18px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.18s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    box-shadow: 4px 4px 0 var(--border-thick);
-    font-family: var(--font-body);
-    width: 100%;
-  }
-  .choice-host { border-color: var(--accent); box-shadow: 4px 4px 0 rgba(255,71,87,0.45); }
-  .choice-host:hover { background: rgba(255,71,87,0.07); transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(255,71,87,0.45); }
-  .choice-join { border-color: var(--accent2); box-shadow: 4px 4px 0 rgba(255,211,42,0.4); }
-  .choice-join:hover { background: rgba(255,211,42,0.07); transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(255,211,42,0.4); }
-  .choice-card:active { transform: translate(2px,2px) !important; box-shadow: 1px 1px 0 var(--border-thick) !important; }
-  .choice-icon { font-size: 36px; display: block; line-height: 1; margin-bottom: 2px; }
-  .choice-title { font-family: var(--font-display); font-size: 32px; display: block; letter-spacing: 2px; }
-  .choice-host .choice-title { color: var(--accent); text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
-  .choice-join .choice-title { color: var(--accent2); text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
-  .choice-sub { font-size: 12px; color: var(--muted); font-weight: 700; display: block; line-height: 1.4; }
+  /* ===== HOME SCREEN ===== */
+  .home-btn { margin-bottom: 12px; }
 
   /* ===== QUICK JOIN ===== */
-  .quick-join { display: flex; gap: 10px; align-items: center; margin-bottom: 20px; }
+  .quick-join { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; margin-top: 4px; }
   .quick-join input { flex: 1; margin-bottom: 0; text-transform: uppercase; font-family: var(--font-display); font-size: 22px; letter-spacing: 4px; text-align: center; }
   .quick-join .btn { width: auto; flex-shrink: 0; margin-bottom: 0; padding: 13px 22px; font-size: 20px; }
+
+  /* ===== HOW TO PLAY LINK ===== */
+  .how-to-play-link {
+    background: none; border: none; color: var(--muted);
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    text-decoration: underline; text-underline-offset: 3px;
+    padding: 6px 0; font-family: var(--font-body); letter-spacing: 0.5px;
+  }
+  .how-to-play-link:hover { color: var(--text); }
 
   /* ===== LIVE TIME ESTIMATE ===== */
   .time-estimate {
@@ -512,10 +498,7 @@
   }
 
   @media(max-width: 500px) {
-    .home-choices { grid-template-columns: 1fr; }
-    .choice-card { padding: 28px 16px 24px; }
-    .choice-icon { font-size: 40px; }
-    .choice-title { font-size: 32px; }
+    .quick-join input { font-size: 18px; letter-spacing: 2px; }
   }
 </style>
 </head>
@@ -556,34 +539,27 @@
         </text>
       </svg>
     </div>
-    <p class="tagline">The Party Answer Game · 2–32 Players</p>
+    <p class="tagline">Drop your wittiest answer. Let the room vote.<br>May the funniest win.</p>
 
-    <div class="home-choices">
-      <button class="choice-card choice-host" onclick="window.showScreen('screen-host-setup')">
-        <span class="choice-icon">🎮</span>
-        <span class="choice-title">HOST</span>
-        <span class="choice-sub">Create a room &amp; invite friends</span>
-      </button>
-      <button class="choice-card choice-join" onclick="window.showScreen('screen-join')">
-        <span class="choice-icon">🔗</span>
-        <span class="choice-title">JOIN</span>
-        <span class="choice-sub">Browse to join a game</span>
-      </button>
-    </div>
+    <button class="btn btn-primary home-btn" onclick="window.showScreen('screen-host-setup')">🎮 HOST A GAME</button>
+    <button class="btn btn-outline home-btn" onclick="window.showScreen('screen-join')">JOIN A GAME</button>
 
     <div class="quick-join">
       <input type="text" id="quick-join-code" placeholder="ROOM CODE" maxlength="10" autocomplete="off" spellcheck="false">
-      <button class="btn btn-accent quick-join-btn" onclick="window.quickJoinFromHome()">JOIN →</button>
+      <button class="btn btn-accent" onclick="window.quickJoinFromHome()">JOIN →</button>
     </div>
 
-    <div class="card">
+    <p class="text-center">
+      <button class="how-to-play-link" onclick="var c=document.getElementById('how-to-play-card');c.style.display=c.style.display==='none'?'block':'none'">How to Play?</button>
+    </p>
+    <div id="how-to-play-card" class="card" style="display:none; margin-top:12px;">
       <div class="card-title">HOW TO PLAY</div>
       <p class="text-muted" style="line-height:1.7;">
-        Each round, players receive hilarious prompts and type their wittiest answers. Then everyone votes for their favorite response. The most-voted answer wins points!
-        The host shares a room code — no app needed, just a browser.
+        Each round, players get a hilarious prompt and type their wittiest answer. Then everyone votes for their favorite — the most-voted answer wins points!
+        No app needed, just a browser.
         <br><br>
-        <strong>Host:</strong> Pick settings and share your room code.<br>
-        <strong>Players:</strong> Enter the room code to join on any device.
+        <strong>Host:</strong> Pick your settings and share the room code.<br>
+        <strong>Players:</strong> Enter the room code on any device to jump in.
       </p>
     </div>
   </div>
