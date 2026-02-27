@@ -4,7 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SPITWIT — The Party Answer Game</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
+<!-- defer allows the page to render immediately while PeerJS loads in the background -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js" defer></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400;1,700&display=swap');
 
@@ -38,20 +39,15 @@
     cursor: default;
   }
 
-  /* Animated doodle background */
   body::before {
     content: '';
     position: fixed;
     inset: 0;
-    background: 
-      radial-gradient(ellipse 70% 50% at 15% 15%, rgba(255,71,87,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 85% 75%, rgba(168,255,62,0.05) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 50% 50%, rgba(255,107,157,0.04) 0%, transparent 70%);
+    background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(255,71,87,0.03) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
   }
 
-  /* Floating doodle elements */
   .doodle-bg {
     position: fixed;
     inset: 0;
@@ -81,12 +77,10 @@
     padding: 20px;
   }
 
-  /* ===== SCREENS ===== */
   .screen { display: none; animation: fadeIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
   .screen.active { display: block; }
   @keyframes fadeIn { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
-  /* ===== LOGO ===== */
   .logo {
     font-family: var(--font-display);
     font-size: clamp(64px, 14vw, 130px);
@@ -96,7 +90,6 @@
     text-align: center;
     display: block;
     position: relative;
-    /* Comic book style text shadow stack */
     text-shadow:
       4px 4px 0 var(--ink),
       -2px -2px 0 var(--ink),
@@ -104,9 +97,13 @@
       -2px 2px 0 var(--ink),
       0 6px 0 rgba(255,71,87,0.6),
       0 10px 20px rgba(255,211,42,0.2);
-    transform: rotate(-1.5deg);
     display: inline-block;
     width: 100%;
+    animation: logoFloat 7s ease-in-out infinite;
+  }
+  @keyframes logoFloat {
+    0%,100% { transform: rotate(-1.5deg) translateY(0); }
+    50% { transform: rotate(-0.8deg) translateY(-8px); }
   }
 
   .logo-wrap {
@@ -115,7 +112,6 @@
     margin-bottom: 4px;
   }
 
-  /* Splat behind logo */
   .logo-wrap::before {
     content: '✦';
     position: absolute;
@@ -149,7 +145,6 @@
     margin-bottom: 36px;
   }
 
-  /* ===== CARDS ===== */
   .card {
     background: var(--surface);
     border: 2px solid var(--border-thick);
@@ -174,7 +169,6 @@
     text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
   }
 
-  /* ===== BUTTONS ===== */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -194,58 +188,28 @@
     position: relative;
   }
 
-  .btn-primary {
-    background: var(--accent);
-    color: white;
-    border-color: var(--ink);
-    box-shadow: 4px 4px 0 var(--ink);
-  }
+  .btn-primary { background: var(--accent); color: white; border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
   .btn-primary:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); }
   .btn-primary:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 
-  .btn-secondary {
-    background: var(--surface2);
-    color: var(--text);
-    border-color: var(--border-thick);
-    box-shadow: 3px 3px 0 var(--border-thick);
-  }
+  .btn-secondary { background: var(--surface2); color: var(--text); border-color: var(--border-thick); box-shadow: 3px 3px 0 var(--border-thick); }
   .btn-secondary:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--border-thick); }
   .btn-secondary:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--border-thick); }
 
-  .btn-accent {
-    background: var(--accent2);
-    color: var(--ink);
-    font-weight: 800;
-    border-color: var(--ink);
-    box-shadow: 4px 4px 0 var(--ink);
-  }
+  .btn-accent { background: var(--accent2); color: var(--ink); font-weight: 800; border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
   .btn-accent:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); background: #ffe04d; }
   .btn-accent:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 
-  .btn-cyan {
-    background: var(--accent3);
-    color: var(--ink);
-    font-weight: 800;
-    border-color: var(--ink);
-    box-shadow: 4px 4px 0 var(--ink);
-  }
+  .btn-cyan { background: var(--accent3); color: var(--ink); font-weight: 800; border-color: var(--ink); box-shadow: 4px 4px 0 var(--ink); }
   .btn-cyan:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0 var(--ink); opacity: 0.9; }
   .btn-cyan:active { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--ink); }
 
-  .btn-sm {
-    padding: 8px 16px;
-    font-size: 16px;
-    margin-bottom: 0;
-    width: auto;
-    letter-spacing: 0.5px;
-    box-shadow: 3px 3px 0 var(--ink);
-  }
+  .btn-sm { padding: 8px 16px; font-size: 16px; margin-bottom: 0; width: auto; letter-spacing: 0.5px; box-shadow: 3px 3px 0 var(--ink); }
   .btn-sm:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--ink); }
   .btn-sm:active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
 
   .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: 2px 2px 0 var(--ink); }
 
-  /* ===== INPUTS ===== */
   input[type=text], input[type=number], textarea, select {
     width: 100%;
     padding: 13px 16px;
@@ -265,25 +229,11 @@
     border-color: var(--accent2);
     box-shadow: 3px 3px 0 var(--accent2);
   }
-  label {
-    display: block;
-    color: var(--muted);
-    font-size: 12px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-  }
+  label { display: block; color: var(--muted); font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
   textarea { min-height: 80px; resize: vertical; }
   select { cursor: pointer; }
 
-  /* ===== PLAYER LIST ===== */
-  .player-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 16px;
-  }
+  .player-list { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
   .player-chip {
     display: flex;
     align-items: center;
@@ -296,6 +246,7 @@
     font-weight: 700;
     box-shadow: 2px 2px 0 var(--border-thick);
   }
+  .player-chip.disconnected { opacity: 0.5; border-style: dashed; }
   .player-chip .dot {
     width: 8px; height: 8px;
     border-radius: 50%;
@@ -305,18 +256,8 @@
   }
   @keyframes pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.7); } }
 
-  /* ===== GAME SCREEN ===== */
-  .round-badge {
-    text-align: center;
-    font-family: var(--font-display);
-    font-size: 17px;
-    letter-spacing: 3px;
-    color: var(--muted);
-    margin-bottom: 12px;
-    text-transform: uppercase;
-  }
+  .round-badge { text-align: center; font-family: var(--font-display); font-size: 17px; letter-spacing: 3px; color: var(--muted); margin-bottom: 12px; text-transform: uppercase; }
 
-  /* Speech-bubble style prompt box */
   .prompt-box {
     background: var(--surface);
     border: 2.5px solid var(--accent);
@@ -328,66 +269,19 @@
     overflow: hidden;
     box-shadow: 5px 5px 0 rgba(255,71,87,0.4);
   }
-  /* Decorative quote marks */
-  .prompt-box::before {
-    content: '💬';
-    position: absolute;
-    top: -14px; left: 16px;
-    font-size: 32px;
-    line-height: 1;
-    pointer-events: none;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-  }
+  .prompt-box::before { content: '💬'; position: absolute; top: -14px; left: 16px; font-size: 32px; line-height: 1; pointer-events: none; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
 
-  .prompt-text {
-    font-size: clamp(18px, 3vw, 24px);
-    font-weight: 800;
-    line-height: 1.4;
-    position: relative;
-    font-family: var(--font-body);
-  }
+  .prompt-text { font-size: clamp(18px, 3vw, 24px); font-weight: 800; line-height: 1.4; position: relative; font-family: var(--font-body); }
 
-  .answer-for {
-    font-family: var(--font-display);
-    font-size: 14px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--accent);
-    margin-bottom: 10px;
-  }
+  .answer-for { font-family: var(--font-display); font-size: 14px; letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
 
-  /* ===== TIMER ===== */
-  .timer-bar-wrap {
-    background: var(--surface2);
-    border-radius: 100px;
-    height: 10px;
-    margin-bottom: 16px;
-    overflow: hidden;
-    border: 2px solid var(--border-thick);
-  }
-  .timer-bar {
-    height: 100%;
-    border-radius: 100px;
-    background: linear-gradient(90deg, var(--accent3), var(--accent2), var(--accent));
-    transition: width 1s linear;
-  }
-  .timer-text {
-    text-align: center;
-    font-family: var(--font-display);
-    font-size: 42px;
-    color: var(--accent2);
-    margin-bottom: 6px;
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.4);
-    letter-spacing: 1px;
-  }
+  .timer-bar-wrap { background: var(--surface2); border-radius: 100px; height: 10px; margin-bottom: 16px; overflow: hidden; border: 2px solid var(--border-thick); }
+  .timer-bar { height: 100%; border-radius: 100px; background: linear-gradient(90deg, var(--accent3), var(--accent2), var(--accent)); transition: width 1s linear; }
+  .timer-text { text-align: center; font-family: var(--font-display); font-size: 42px; color: var(--accent2); margin-bottom: 6px; text-shadow: 3px 3px 0 rgba(0,0,0,0.4); letter-spacing: 1px; }
 
-  /* ===== VOTING ===== */
-  .vote-options {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 20px;
-  }
+  .char-counter { text-align: right; font-size: 12px; font-weight: 700; color: var(--muted); margin-top: -8px; margin-bottom: 12px; letter-spacing: 0.5px; transition: color 0.2s; }
+
+  .vote-options { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
   .vote-option {
     background: var(--surface2);
     border: 2.5px solid var(--border-thick);
@@ -403,83 +297,32 @@
   }
   .vote-option:hover { border-color: var(--accent); transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--accent); }
   .vote-option.selected { border-color: var(--accent2); background: rgba(255,211,42,0.1); box-shadow: 4px 4px 0 var(--accent2); transform: translate(-2px, -2px); }
-  .vote-option.winning { border-color: var(--accent3); background: rgba(168,255,62,0.08); box-shadow: 4px 4px 0 var(--accent3); }
+  .vote-option.winning { border-color: var(--accent3); background: rgba(168,255,62,0.12); box-shadow: 4px 4px 0 var(--accent3), 0 0 28px rgba(168,255,62,0.25); animation: winCelebrate 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both, winnerGlow 2s ease-in-out 0.55s infinite alternate; }
+  @keyframes winCelebrate { 0% { transform: scale(0.93) translateY(6px); opacity: 0.6; } 60% { transform: scale(1.06) translateY(-6px) translate(-2px,-2px); } 100% { transform: scale(1.02) translateY(-3px) translate(-2px,-2px); } }
+  @keyframes winnerGlow { from { box-shadow: 4px 4px 0 var(--accent3), 0 0 20px rgba(168,255,62,0.2); } to { box-shadow: 4px 4px 0 var(--accent3), 0 0 45px rgba(168,255,62,0.45); } }
   .vote-option.losing { opacity: 0.45; }
   .vote-option .voter-name { font-size: 11px; color: var(--muted); margin-top: 8px; letter-spacing: 1px; text-transform: uppercase; font-weight: 800; }
   .vote-option .vote-count { font-family: var(--font-display); font-size: 44px; color: var(--accent2); margin-top: 6px; text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
 
-  /* ===== SCORES ===== */
   .score-list { list-style: none; }
-  .score-item {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 0;
-    border-bottom: 2px dashed var(--border);
-  }
-  .score-rank {
-    font-family: var(--font-display);
-    font-size: 30px;
-    width: 42px;
-    color: var(--muted);
-    flex-shrink: 0;
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.3);
-  }
+  .score-item { display: flex; align-items: center; gap: 12px; padding: 14px 0; border-bottom: 2px dashed var(--border); }
+  .score-rank { font-family: var(--font-display); font-size: 30px; width: 42px; color: var(--muted); flex-shrink: 0; text-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
   .score-rank.gold { color: var(--accent2); }
   .score-rank.silver { color: #c8c8d4; }
   .score-rank.bronze { color: #cd7f32; }
   .score-name { flex: 1; font-weight: 800; font-size: 16px; }
-  .score-pts {
-    font-family: var(--font-display);
-    font-size: 30px;
-    color: var(--accent3);
-    text-shadow: 2px 2px 0 rgba(0,0,0,0.4);
-  }
-  .score-delta {
-    font-size: 13px;
-    color: var(--accent);
-    font-weight: 800;
-    min-width: 60px;
-    text-align: right;
-  }
+  .score-pts { font-family: var(--font-display); font-size: 30px; color: var(--accent3); text-shadow: 2px 2px 0 rgba(0,0,0,0.4); }
+  .score-delta { font-size: 13px; color: var(--accent); font-weight: 800; min-width: 60px; text-align: right; }
 
-  /* ===== JOIN SCREEN ===== */
-  .room-code {
-    font-family: var(--font-display);
-    font-size: 64px;
-    letter-spacing: 10px;
-    color: var(--accent2);
-    text-align: center;
-    background: var(--surface2);
-    border: 2.5px dashed var(--border-thick);
-    border-radius: var(--radius);
-    padding: 20px;
-    margin-bottom: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 4px 4px 0 var(--border-thick);
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.4);
-  }
+  .room-code { font-family: var(--font-display); font-size: 64px; letter-spacing: 10px; color: var(--accent2); text-align: center; background: var(--surface2); border: 2.5px dashed var(--border-thick); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; cursor: pointer; transition: all 0.2s; box-shadow: 4px 4px 0 var(--border-thick); text-shadow: 3px 3px 0 rgba(0,0,0,0.4); }
   .room-code:hover { border-color: var(--accent2); box-shadow: 6px 6px 0 var(--accent2); transform: translate(-2px, -2px); }
   .room-code-hint { text-align: center; font-size: 12px; color: var(--muted); letter-spacing: 1px; font-weight: 700; margin-bottom: 20px; }
 
-  /* ===== STATUS ===== */
-  .status-badge {
-    display: inline-block;
-    padding: 5px 14px;
-    border-radius: 100px;
-    font-size: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 800;
-    margin-bottom: 16px;
-    border: 2px solid transparent;
-  }
+  .status-badge { display: inline-block; padding: 5px 14px; border-radius: 100px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; font-weight: 800; margin-bottom: 16px; border: 2px solid transparent; }
   .status-waiting { background: rgba(255,211,42,0.15); color: var(--accent2); border-color: rgba(255,211,42,0.4); }
   .status-connected { background: rgba(168,255,62,0.12); color: var(--accent3); border-color: rgba(168,255,62,0.4); }
   .status-error { background: rgba(255,71,87,0.15); color: var(--accent); border-color: rgba(255,71,87,0.4); }
 
-  /* ===== QUIPLASH ANSWER LIST ===== */
   .answer-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
   .answer-item {
     background: var(--surface2);
@@ -498,12 +341,10 @@
   .answer-item:hover { border-color: var(--accent); transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--accent); }
   .answer-item.selected { border-color: var(--accent2); background: rgba(255,211,42,0.08); box-shadow: 4px 4px 0 var(--accent2); transform: translate(-2px,-2px); }
 
-  /* ===== TABS ===== */
   .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--surface2); border-radius: var(--radius); padding: 4px; border: 2px solid var(--border-thick); }
   .tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 800; color: var(--muted); transition: all 0.2s; letter-spacing: 1px; text-transform: uppercase; border: none; background: none; font-family: var(--font-body); }
   .tab.active { background: var(--accent); color: white; box-shadow: 2px 2px 0 rgba(0,0,0,0.3); }
 
-  /* ===== MISC ===== */
   .row { display: flex; gap: 12px; }
   .row .btn { flex: 1; margin-bottom: 0; }
   .divider { border: none; border-top: 2px dashed var(--border); margin: 20px 0; }
@@ -513,136 +354,35 @@
   .mt-4 { margin-top: 16px; }
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 
-  .winner-banner {
-    font-family: var(--font-display);
-    font-size: 52px;
-    text-align: center;
-    color: var(--accent2);
-    margin-bottom: 8px;
-    text-shadow:
-      3px 3px 0 var(--ink),
-      -1px -1px 0 var(--ink),
-      0 6px 0 rgba(255,71,87,0.5),
-      0 12px 24px rgba(255,211,42,0.3);
-    animation: winnerPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-  @keyframes winnerPop {
-    from { transform: scale(0.5) rotate(-5deg); opacity: 0; }
-    to { transform: scale(1) rotate(0deg); opacity: 1; }
-  }
+  .winner-banner { font-family: var(--font-display); font-size: 52px; text-align: center; color: var(--accent2); margin-bottom: 8px; text-shadow: 3px 3px 0 var(--ink), -1px -1px 0 var(--ink), 0 6px 0 rgba(255,71,87,0.5), 0 12px 24px rgba(255,211,42,0.3); animation: winnerPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
+  @keyframes winnerPop { from { transform: scale(0.5) rotate(-5deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
 
   .confetti { font-size: 40px; text-align: center; margin: 10px 0; animation: bounce 0.5s ease infinite alternate; }
   @keyframes bounce { to { transform: translateY(-12px) rotate(5deg); } }
-  
-  .waiting-spinner {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    color: var(--muted);
-    font-size: 14px;
-    font-weight: 700;
-    padding: 20px;
-  }
-  .spinner {
-    width: 22px; height: 22px;
-    border: 3px solid var(--border-thick);
-    border-top-color: var(--accent2);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-  }
+
+  .waiting-spinner { display: flex; align-items: center; justify-content: center; gap: 10px; color: var(--muted); font-size: 14px; font-weight: 700; padding: 20px; }
+  .spinner { width: 22px; height: 22px; border: 3px solid var(--border-thick); border-top-color: var(--accent2); border-radius: 50%; animation: spin 0.7s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .notification {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--surface2);
-    border: 2.5px solid var(--accent2);
-    padding: 12px 24px;
-    border-radius: 100px;
-    font-size: 14px;
-    font-weight: 800;
-    z-index: 1000;
-    animation: notifPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    white-space: nowrap;
-    box-shadow: 4px 4px 0 var(--ink);
-    color: var(--accent2);
-  }
+  .notification { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: var(--surface2); border: 2.5px solid var(--accent2); padding: 12px 24px; border-radius: 100px; font-size: 14px; font-weight: 800; z-index: 1000; animation: notifPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); white-space: nowrap; box-shadow: 4px 4px 0 var(--ink); color: var(--accent2); }
   @keyframes notifPop { from { opacity: 0; transform: translateX(-50%) scale(0.8) translateY(10px); } to { opacity: 1; transform: translateX(-50%) scale(1) translateY(0); } }
 
-  .mute-btn {
-    position: fixed;
-    top: 14px;
-    right: 14px;
-    z-index: 999;
-    background: var(--surface2);
-    border: 2px solid var(--border-thick);
-    color: var(--text);
-    border-radius: 50%;
-    width: 42px;
-    height: 42px;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-    box-shadow: 3px 3px 0 var(--border-thick);
-  }
+  .mute-btn { position: fixed; top: 14px; right: 14px; z-index: 999; background: var(--surface2); border: 2px solid var(--border-thick); color: var(--text); border-radius: 50%; width: 42px; height: 42px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; box-shadow: 3px 3px 0 var(--border-thick); }
   .mute-btn:hover { transform: translate(-1px,-1px); box-shadow: 4px 4px 0 var(--border-thick); }
 
   .custom-prompts-list { list-style: none; display: flex; flex-direction: column; gap: 8px; max-height: 220px; overflow-y: auto; }
-  .custom-prompt-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 14px;
-    background: var(--surface2);
-    border: 2px solid var(--border-thick);
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    box-shadow: 2px 2px 0 var(--border-thick);
-  }
+  .custom-prompt-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: var(--surface2); border: 2px solid var(--border-thick); border-radius: 10px; font-size: 14px; font-weight: 600; box-shadow: 2px 2px 0 var(--border-thick); }
   .custom-prompt-item button { background: none; border: none; color: var(--accent); cursor: pointer; font-size: 20px; font-weight: 800; }
 
-  /* ===== RECAP ===== */
   .recap-card { margin-bottom: 16px; }
   .recap-prompt-num { font-family: var(--font-display); font-size: 13px; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; margin-bottom: 6px; }
   .recap-prompt-text { font-size: 17px; font-weight: 800; margin-bottom: 14px; line-height: 1.4; color: var(--text); }
-  .recap-answer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    background: var(--bg);
-    border: 2px solid var(--border-thick);
-    border-radius: 10px;
-    margin-bottom: 8px;
-    flex-wrap: wrap;
-    box-shadow: 2px 2px 0 var(--border-thick);
-  }
+  .recap-answer { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; background: var(--bg); border: 2px solid var(--border-thick); border-radius: 10px; margin-bottom: 8px; flex-wrap: wrap; box-shadow: 2px 2px 0 var(--border-thick); }
   .recap-answer-winner { border-color: var(--accent2); background: rgba(255,211,42,0.06); box-shadow: 2px 2px 0 var(--accent2); }
   .recap-answer-text { font-size: 15px; font-weight: 700; flex: 1; }
   .recap-answer-meta { font-size: 12px; color: var(--muted); white-space: nowrap; letter-spacing: 0.5px; font-weight: 800; }
 
-  /* ===== SETTING TOGGLE ===== */
-  .setting-toggle {
-    display: flex;
-    align-items: flex-start;
-    gap: 14px;
-    padding: 14px;
-    background: var(--surface2);
-    border: 2px solid var(--border-thick);
-    border-radius: var(--radius);
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: all 0.15s;
-    box-shadow: 2px 2px 0 var(--border-thick);
-  }
+  .setting-toggle { display: flex; align-items: flex-start; gap: 14px; padding: 14px; background: var(--surface2); border: 2px solid var(--border-thick); border-radius: var(--radius); margin-bottom: 10px; cursor: pointer; transition: all 0.15s; box-shadow: 2px 2px 0 var(--border-thick); }
   .setting-toggle:hover { border-color: var(--accent2); box-shadow: 3px 3px 0 var(--accent2); transform: translate(-1px,-1px); }
   .setting-toggle input[type=checkbox] { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; accent-color: var(--accent); }
   .setting-toggle-label { flex: 1; }
@@ -656,261 +396,91 @@
     .row .btn { margin-bottom: 0; }
   }
 
-  /* ===== BLIND VOTE BADGE ===== */
-  .blind-badge {
-    display: inline-block;
-    background: rgba(255,71,87,0.12);
-    border: 2px solid rgba(255,71,87,0.4);
-    color: var(--accent);
-    padding: 5px 14px;
-    border-radius: 100px;
-    font-size: 12px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 800;
-    margin-bottom: 14px;
-  }
+  .blind-badge { display: inline-block; background: rgba(255,71,87,0.12); border: 2px solid rgba(255,71,87,0.4); color: var(--accent); padding: 5px 14px; border-radius: 100px; font-size: 12px; letter-spacing: 1px; text-transform: uppercase; font-weight: 800; margin-bottom: 14px; }
 
-  /* ===== TTS INDICATOR ===== */
-  .tts-bar {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    background: var(--surface2);
-    border: 2px solid var(--border-thick);
-    border-radius: var(--radius);
-    padding: 12px 16px;
-    margin-bottom: 14px;
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--accent3);
-  }
-  .tts-wave {
-    display: flex;
-    align-items: flex-end;
-    gap: 3px;
-    height: 20px;
-  }
-  .tts-wave span {
-    display: block;
-    width: 4px;
-    background: var(--accent3);
-    border-radius: 2px;
-    animation: ttsWave 0.8s ease-in-out infinite;
-  }
+  .tts-bar { display: flex; align-items: center; gap: 10px; background: var(--surface2); border: 2px solid var(--border-thick); border-radius: var(--radius); padding: 12px 16px; margin-bottom: 14px; font-size: 14px; font-weight: 800; color: var(--accent3); }
+  .tts-wave { display: flex; align-items: flex-end; gap: 3px; height: 20px; }
+  .tts-wave span { display: block; width: 4px; background: var(--accent3); border-radius: 2px; animation: ttsWave 0.8s ease-in-out infinite; }
   .tts-wave span:nth-child(2) { animation-delay: 0.1s; }
   .tts-wave span:nth-child(3) { animation-delay: 0.2s; }
   .tts-wave span:nth-child(4) { animation-delay: 0.3s; }
   .tts-wave span:nth-child(5) { animation-delay: 0.15s; }
-  @keyframes ttsWave {
-    0%, 100% { height: 4px; }
-    50% { height: 18px; }
-  }
+  @keyframes ttsWave { 0%, 100% { height: 4px; } 50% { height: 18px; } }
 
-  /* ===== HOST DISPLAY WINDOW ===== */
-  .host-display-btn {
-    position: fixed;
-    bottom: 16px;
-    right: 16px;
-    z-index: 999;
-    background: var(--accent2);
-    color: var(--ink);
-    border: 2.5px solid var(--ink);
-    border-radius: 100px;
-    padding: 10px 20px;
-    font-family: var(--font-display);
-    font-size: 17px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    box-shadow: 4px 4px 0 var(--ink);
-    transition: all 0.15s;
-    display: none;
-  }
+  .host-display-btn { position: fixed; bottom: 16px; right: 16px; z-index: 999; background: var(--accent2); color: var(--ink); border: 2.5px solid var(--ink); border-radius: 100px; padding: 10px 20px; font-family: var(--font-display); font-size: 17px; letter-spacing: 1px; cursor: pointer; box-shadow: 4px 4px 0 var(--ink); transition: all 0.15s; display: none; }
   .host-display-btn:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 var(--ink); }
   .host-display-btn.visible { display: flex; align-items: center; gap: 8px; }
 
-  /* ===== HOST TV DISPLAY SCREEN ===== */
-  #screen-tv {
-    background: var(--bg);
-    min-height: 100vh;
+  /* ===== AMBIENT BLOBS ===== */
+  .bg-blob {
+    position: fixed; border-radius: 50%; filter: blur(90px);
+    pointer-events: none; z-index: 0; opacity: 0.13;
+    transition: background 2s ease; will-change: transform;
   }
-  .tv-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 40px;
-    text-align: center;
-  }
-  .tv-prompt {
-    font-size: clamp(28px, 5vw, 52px);
-    font-weight: 800;
-    line-height: 1.3;
-    margin: 30px 0;
-    color: var(--text);
-  }
-  .tv-answers {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 24px;
-    margin-top: 30px;
-  }
-  .tv-answer-card {
-    background: var(--surface);
-    border: 2.5px solid var(--border-thick);
-    border-radius: 16px;
-    padding: 30px 24px;
-    font-size: clamp(18px, 2.5vw, 28px);
-    font-weight: 700;
-    line-height: 1.4;
-    min-height: 120px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 4px 4px 0 var(--border-thick);
-  }
-  .tv-answer-card.revealed {
-    border-color: var(--accent3);
-    background: rgba(168,255,62,0.05);
-    box-shadow: 4px 4px 0 var(--accent3);
-  }
-  .tv-answer-card.winning {
-    border-color: var(--accent2);
-    background: rgba(255,211,42,0.08);
-    box-shadow: 6px 6px 0 var(--accent2);
-  }
-  .tv-answer-card .tv-player-name {
-    font-size: 14px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    display: none;
-    font-weight: 800;
-  }
-  .tv-answer-card.revealed .tv-player-name { display: block; color: var(--accent3); }
-  .tv-answer-card.winning .tv-player-name { color: var(--accent2); }
-  .tv-vote-count {
-    font-family: var(--font-display);
-    font-size: 52px;
-    color: var(--accent2);
-    display: none;
-    text-shadow: 3px 3px 0 rgba(0,0,0,0.4);
-  }
-  .tv-answer-card.revealed .tv-vote-count { display: block; }
-  .tv-phase-label {
-    font-family: var(--font-display);
-    font-size: 28px;
-    letter-spacing: 4px;
-    color: var(--muted);
-    margin-bottom: 10px;
-  }
-  .tv-room-code {
-    font-family: var(--font-display);
-    font-size: 60px;
-    letter-spacing: 10px;
-    color: var(--accent2);
-    margin: 20px 0 8px;
-    text-shadow: 4px 4px 0 rgba(0,0,0,0.4);
-  }
-  .tv-player-chips {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 20px;
-  }
-  .tv-chip {
-    background: var(--surface2);
-    border: 2px solid var(--border-thick);
-    border-radius: 100px;
-    padding: 8px 20px;
-    font-size: 16px;
-    font-weight: 700;
-    box-shadow: 2px 2px 0 var(--border-thick);
-  }
-  .tv-timer {
-    font-family: var(--font-display);
-    font-size: 88px;
-    color: var(--accent);
-    line-height: 1;
-    margin: 10px 0;
-    text-shadow: 4px 4px 0 rgba(0,0,0,0.4);
-  }
-  .tv-answering-list {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 12px;
-    margin-top: 20px;
-  }
-  .tv-answered-chip {
-    padding: 10px 22px;
-    border-radius: 100px;
-    font-size: 16px;
-    font-weight: 700;
-    border: 2.5px solid var(--border-thick);
-    background: var(--surface);
-    transition: all 0.3s;
-    box-shadow: 2px 2px 0 var(--border-thick);
-  }
-  .tv-answered-chip.done {
-    border-color: var(--accent3);
-    background: rgba(168,255,62,0.1);
-    box-shadow: 2px 2px 0 var(--accent3);
-    color: var(--accent3);
-  }
+  .bg-blob-1 { width: 600px; height: 600px; top: -200px; left: -200px; background: var(--accent); animation: blobFloat1 20s ease-in-out infinite; }
+  .bg-blob-2 { width: 500px; height: 500px; bottom: -150px; right: -150px; background: var(--accent3); animation: blobFloat2 25s ease-in-out infinite; }
+  .bg-blob-3 { width: 380px; height: 380px; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--accent4); animation: blobFloat3 18s ease-in-out infinite; opacity: 0.08; }
+  @keyframes blobFloat1 { 0%,100% { transform: translate(0,0); } 33% { transform: translate(100px,80px); } 66% { transform: translate(-60px,120px); } }
+  @keyframes blobFloat2 { 0%,100% { transform: translate(0,0); } 33% { transform: translate(-120px,-80px); } 66% { transform: translate(80px,-110px); } }
+  @keyframes blobFloat3 { 0%,100% { transform: translate(-50%,-50%); } 33% { transform: translate(-62%,-40%); } 66% { transform: translate(-38%,-60%); } }
 
-  /* Settings toggle rows */
-  .setting-toggle {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--border);
-    cursor: pointer;
+  /* Phase-specific ambient colors */
+  body.phase-voting .bg-blob-1 { background: var(--accent2); }
+  body.phase-voting .bg-blob-2 { background: #ffa502; }
+  body.phase-results .bg-blob-1 { background: var(--accent3); }
+  body.phase-results .bg-blob-2 { background: #2ed573; }
+  body.phase-scoreboard .bg-blob-1 { background: #70a1ff; }
+  body.phase-scoreboard .bg-blob-2 { background: #5352ed; }
+  body.phase-winner .bg-blob-1 { background: var(--accent2); }
+  body.phase-winner .bg-blob-2 { background: var(--accent4); }
+  body.phase-winner .bg-blob-3 { background: var(--accent3); opacity: 0.1; }
+
+  /* ===== TIMER URGENCY ===== */
+  .timer-text.urgent { color: var(--accent); animation: urgentPulse 0.45s ease-in-out infinite alternate; }
+  @keyframes urgentPulse { from { transform: scale(1); } to { transform: scale(1.12); } }
+  .timer-bar.urgent { background: linear-gradient(90deg, #ff2d3b, var(--accent), #ff6b35) !important; }
+
+  /* ===== CARD ENTRANCE ANIMATIONS ===== */
+  @keyframes slideInCard { from { opacity: 0; transform: translateY(14px) scale(0.96); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  .answer-item { animation: slideInCard 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards; }
+  @keyframes scoreSlideIn { from { opacity: 0; transform: translateX(-20px); } to { opacity: 1; transform: translateX(0); } }
+  .score-item { animation: scoreSlideIn 0.3s ease backwards; }
+
+  /* ===== CONFETTI ===== */
+  .confetti-piece { position: fixed; pointer-events: none; z-index: 9998; top: -20px; animation: confettiFall linear forwards; }
+  @keyframes confettiFall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(110vh) rotate(820deg); opacity: 0; } }
+
+  /* ===== ACCESSIBILITY ===== */
+  @media (prefers-reduced-motion: reduce) {
+    .bg-blob, .logo, .timer-text.urgent, .vote-option.winning, .answer-item, .score-item, .confetti-piece, .doodle-bg span { animation: none !important; transition: none !important; }
   }
-  .setting-toggle:last-child { border-bottom: none; }
-  .setting-toggle input[type=checkbox] { width: 18px; height: 18px; margin: 0; cursor: pointer; accent-color: var(--accent); }
-  .setting-toggle-label { flex: 1; }
-  .setting-toggle-label strong { display: block; font-size: 15px; margin-bottom: 2px; }
-  .setting-toggle-label span { font-size: 13px; color: var(--muted); }
 </style>
 </head>
 <body>
 
-<button class="mute-btn" id="mute-btn" onclick="toggleMute()" title="Toggle sound">🔊</button>
-<button class="host-display-btn" id="host-display-btn" onclick="openHostDisplay()" title="Open TV Display">📺 TV MODE</button>
+<button class="mute-btn" id="mute-btn" onclick="window.toggleMute()" title="Toggle sound">🔊</button>
+<button class="host-display-btn" id="host-display-btn" onclick="window.openHostDisplay()" title="Open TV Display">📺 TV MODE</button>
 
-<!-- Floating doodle background -->
+<div class="bg-blob bg-blob-1"></div>
+<div class="bg-blob bg-blob-2"></div>
+<div class="bg-blob bg-blob-3"></div>
 <div class="doodle-bg" id="doodle-bg"></div>
-
-<!-- ===== TV HOST DISPLAY SCREEN (opens in new window) ===== -->
-<div id="screen-tv" class="screen">
-  <div class="tv-container">
-    <div id="tv-content">
-      <!-- dynamically populated -->
-    </div>
-  </div>
-</div>
 
 <!-- ===== HOME SCREEN ===== -->
 <div id="screen-home" class="screen active">
   <div class="container" style="padding-top: 60px;">
     <div class="logo-wrap"><span class="logo">SPITWIT</span></div>
     <p class="tagline">The Party Answer Game · 2–32 Players</p>
-    
+
     <div class="card">
-      <button class="btn btn-primary" onclick="showScreen('screen-host-setup')">🎮 HOST A GAME</button>
-      <button class="btn btn-secondary" onclick="showScreen('screen-join')">🔗 JOIN A GAME</button>
+      <button class="btn btn-primary" onclick="window.showScreen('screen-host-setup')">🎮 HOST A GAME</button>
+      <button class="btn btn-secondary" onclick="window.showScreen('screen-join')">🔗 JOIN A GAME</button>
     </div>
 
     <div class="card">
       <div class="card-title">HOW TO PLAY</div>
       <p class="text-muted" style="line-height:1.7;">
-        Each round, players receive hilarious prompts and type their wittiest answers. Then everyone votes for their favorite response. The most-voted answer wins points! 
+        Each round, players receive hilarious prompts and type their wittiest answers. Then everyone votes for their favorite response. The most-voted answer wins points!
         The host shares a room code — no app needed, just a browser.
         <br><br>
         <strong>Host:</strong> Pick settings and share your room code.<br>
@@ -924,19 +494,19 @@
 <div id="screen-host-setup" class="screen">
   <div class="container" style="padding-top: 40px;">
     <div class="logo-wrap"><span class="logo" style="font-size: 48px;">SPITWIT</span></div>
-    
+
     <div class="card">
       <div class="card-title">GAME SETTINGS</div>
-      
+
       <div class="tabs">
-        <button class="tab active" onclick="switchTab('settings')">Settings</button>
-        <button class="tab" onclick="switchTab('custom-prompts')">Custom Prompts</button>
+        <button class="tab active" onclick="window.switchTab('settings')">Settings</button>
+        <button class="tab" onclick="window.switchTab('custom-prompts')">Custom Prompts</button>
       </div>
 
       <div id="tab-settings">
         <label>Your Name (Host)</label>
         <input type="text" id="host-name" placeholder="Enter your name..." maxlength="20">
-        
+
         <label>Number of Rounds</label>
         <select id="num-rounds">
           <option value="3">3 Rounds (Quick ~15 min)</option>
@@ -962,10 +532,12 @@
 
         <label>Prompt Pack</label>
         <select id="prompt-pack">
-          <option value="all">🌈 Everything (All 400+ Prompts)</option>
+          <option value="all">🌈 Everything (500+ Prompts)</option>
           <option value="party">🎉 Party Vibes</option>
           <option value="dark">🌑 Dark Humor</option>
           <option value="wholesome">☀️ Wholesome</option>
+          <option value="internet">🌐 Internet &amp; Meme Culture</option>
+          <option value="work">💼 SFW Work Creativity</option>
           <option value="personalized">👤 Personalized (All About You)</option>
           <option value="custom-only">✏️ My Custom Prompts Only</option>
         </select>
@@ -1019,24 +591,24 @@
 
       <div id="tab-custom-prompts" style="display:none;">
         <label>Add a Custom Prompt</label>
-        <input type="text" id="custom-prompt-input" placeholder="Type a prompt and press Enter..." onkeydown="if(event.key==='Enter'){event.preventDefault();addCustomPrompt();}">
+        <input type="text" id="custom-prompt-input" placeholder="Type a prompt and press Enter..." onkeydown="if(event.key==='Enter'){event.preventDefault();window.addCustomPrompt();}">
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;">
-          <button class="btn btn-secondary btn-sm" onclick="addCustomPrompt()">+ Add Prompt</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.addCustomPrompt()">+ Add Prompt</button>
           <label class="btn btn-secondary btn-sm" style="cursor:pointer;margin:0;" title="Upload a .txt file — one prompt per line">
             📂 Upload List
-            <input type="file" id="custom-prompt-file" accept=".txt" style="display:none;" onchange="importPromptsFromFile(this)">
+            <input type="file" id="custom-prompt-file" accept=".txt" style="display:none;" onchange="window.importPromptsFromFile(this)">
           </label>
         </div>
-        <p class="text-muted" style="font-size:12px;margin-bottom:12px;">💡 Tip: Upload a .txt file with one prompt per line to bulk-add prompts.</p>
-        
+        <p class="text-muted" style="font-size:12px;margin-bottom:12px;">💡 Tip: Upload a .txt file with one prompt per line to bulk-add prompts. Prompts are saved automatically.</p>
+
         <div id="custom-prompts-count" class="text-muted mb-4" style="font-size:13px;">0 custom prompts added</div>
         <ul class="custom-prompts-list" id="custom-prompts-list"></ul>
       </div>
     </div>
 
     <div class="row">
-      <button class="btn btn-secondary" onclick="showScreen('screen-home')">← BACK</button>
-      <button class="btn btn-primary" onclick="startHosting()">CREATE LOBBY →</button>
+      <button class="btn btn-secondary" onclick="window.showScreen('screen-home')">← BACK</button>
+      <button class="btn btn-primary" onclick="window.startHosting()">CREATE LOBBY →</button>
     </div>
   </div>
 </div>
@@ -1045,10 +617,10 @@
 <div id="screen-host-lobby" class="screen">
   <div class="container" style="padding-top: 40px;">
     <div class="logo-wrap"><span class="logo" style="font-size: 48px;">SPITWIT</span></div>
-    
+
     <div class="card text-center">
       <div class="card-title text-center">SHARE THIS CODE</div>
-      <div class="room-code" id="room-code-display" onclick="copyRoomCode()" title="Click to copy">----</div>
+      <div class="room-code" id="room-code-display" onclick="window.copyRoomCode()" title="Click to copy">----</div>
       <div class="room-code-hint">Click to copy · Players go to this same page and enter the code</div>
       <div id="host-connection-status" class="status-badge status-waiting">Setting up...</div>
     </div>
@@ -1059,10 +631,10 @@
       <div class="text-muted" style="font-size:13px;">Waiting for more players to join...</div>
     </div>
 
-    <button class="btn btn-accent" id="start-game-btn" onclick="hostStartGame()" style="margin-top:8px;">
+    <button class="btn btn-accent" id="start-game-btn" onclick="window.hostStartGame()" style="margin-top:8px;">
       START GAME ▶
     </button>
-    <button class="btn btn-secondary" onclick="leaveGame()">← CANCEL</button>
+    <button class="btn btn-secondary" onclick="window.leaveGame()">← CANCEL</button>
   </div>
 </div>
 
@@ -1070,22 +642,22 @@
 <div id="screen-join" class="screen">
   <div class="container" style="padding-top: 60px;">
     <div class="logo-wrap"><span class="logo" style="font-size: 48px;">SPITWIT</span></div>
-    
+
     <div class="card">
       <div class="card-title">JOIN A GAME</div>
-      
+
       <label>Your Name</label>
       <input type="text" id="join-name" placeholder="Enter your name..." maxlength="20">
-      
+
       <label>Room Code</label>
       <input type="text" id="join-code" placeholder="e.g. A1B2" maxlength="10" style="text-transform:uppercase;font-family:var(--font-display);font-size:32px;letter-spacing:6px;text-align:center;">
-      
+
       <div id="join-status" class="status-badge status-waiting" style="display:none;"></div>
     </div>
 
     <div class="row">
-      <button class="btn btn-secondary" onclick="showScreen('screen-home')">← BACK</button>
-      <button class="btn btn-cyan" onclick="joinGame()">JOIN GAME →</button>
+      <button class="btn btn-secondary" onclick="window.showScreen('screen-home')">← BACK</button>
+      <button class="btn btn-cyan" onclick="window.joinGame()">JOIN GAME →</button>
     </div>
   </div>
 </div>
@@ -1100,7 +672,7 @@
       <div class="waiting-spinner"><div class="spinner"></div> Waiting for the host to start...</div>
       <div class="player-list" id="wait-player-list" style="margin-top: 16px;"></div>
     </div>
-    <button class="btn btn-secondary" onclick="leaveGame()">← LEAVE</button>
+    <button class="btn btn-secondary" onclick="window.leaveGame()">← LEAVE</button>
   </div>
 </div>
 
@@ -1109,7 +681,7 @@
   <div class="container" style="padding-top: 30px;">
     <div class="logo-wrap"><span class="logo" style="font-size: 36px; margin-bottom: 16px; display:block;">SPITWIT</span></div>
     <div class="round-badge" id="answer-round-badge">ROUND 1 · PROMPT 1 OF 3</div>
-    
+
     <div class="timer-text" id="answer-timer">60</div>
     <div class="timer-bar-wrap"><div class="timer-bar" id="answer-timer-bar" style="width:100%"></div></div>
 
@@ -1120,7 +692,8 @@
 
     <label>Your Answer</label>
     <textarea id="answer-input" placeholder="Type your funniest answer..." maxlength="150" rows="3"></textarea>
-    <button class="btn btn-primary" id="submit-answer-btn" onclick="submitAnswer()">SUBMIT ANSWER ✓</button>
+    <div class="char-counter" id="char-counter">150 left</div>
+    <button class="btn btn-primary" id="submit-answer-btn" onclick="window.submitAnswer()">SUBMIT ANSWER ✓</button>
     <div id="answer-submitted-msg" style="display:none;text-align:center;color:var(--accent3);font-weight:600;padding:20px;">
       ✓ Answer submitted! Waiting for others...
     </div>
@@ -1139,7 +712,7 @@
         <span id="tts-reading-text">Reading answers aloud...</span>
       </div>
     </div>
-    
+
     <div id="blind-vote-badge" style="display:none;"><div class="blind-badge">🕵️ Blind Voting — names hidden until results</div></div>
 
     <div class="timer-text" id="vote-timer">30</div>
@@ -1150,27 +723,27 @@
     </div>
 
     <div class="answer-list" id="vote-answers-list"></div>
-    <button class="btn btn-accent" id="vote-submit-btn" onclick="submitVote()">CAST VOTE ✓</button>
+    <button class="btn btn-accent" id="vote-submit-btn" onclick="window.submitVote()">CAST VOTE ✓</button>
     <div id="vote-submitted-msg" style="display:none;text-align:center;color:var(--accent3);font-weight:600;padding:20px;">
       ✓ Vote cast! Waiting for results...
     </div>
   </div>
 </div>
 
-<!-- ===== RESULTS SCREEN (host shows, players watch) ===== -->
+<!-- ===== RESULTS SCREEN ===== -->
 <div id="screen-results" class="screen">
   <div class="container" style="padding-top: 30px;">
     <div class="logo-wrap"><span class="logo" style="font-size: 36px; margin-bottom: 16px; display:block;">SPITWIT</span></div>
     <div class="round-badge" id="results-badge">RESULTS</div>
-    
+
     <div class="prompt-box">
       <div class="prompt-text" id="results-prompt-text"></div>
     </div>
 
     <div id="results-answers" class="vote-options"></div>
-    
+
     <div id="results-next-area" style="margin-top: 20px; display: none;">
-      <button class="btn btn-accent" onclick="hostNextRound()" id="next-btn">NEXT →</button>
+      <button class="btn btn-accent" onclick="window.hostNextRound()" id="next-btn">NEXT →</button>
     </div>
     <div id="results-wait-area" style="margin-top: 20px;">
       <div class="waiting-spinner"><div class="spinner"></div> Waiting for next round...</div>
@@ -1183,14 +756,14 @@
   <div class="container" style="padding-top: 30px;">
     <div class="logo-wrap"><span class="logo" style="font-size: 48px; margin-bottom: 8px; display:block;">SPITWIT</span></div>
     <div class="round-badge" id="scoreboard-badge">ROUND SCORES</div>
-    
+
     <div class="card">
       <div class="card-title">LEADERBOARD</div>
       <ul class="score-list" id="score-list"></ul>
     </div>
 
     <div id="scoreboard-next-area" style="display:none;">
-      <button class="btn btn-primary" onclick="hostContinue()" id="continue-btn">CONTINUE →</button>
+      <button class="btn btn-primary" onclick="window.hostContinue()" id="continue-btn">CONTINUE →</button>
     </div>
     <div id="scoreboard-wait-area">
       <div class="waiting-spinner"><div class="spinner"></div> Waiting for host...</div>
@@ -1211,9 +784,9 @@
       <ul class="score-list" id="final-score-list"></ul>
     </div>
 
-    <button class="btn btn-primary" onclick="playAgain()">PLAY AGAIN 🔄</button>
-    <button class="btn btn-secondary" onclick="showRecap()">📜 GAME RECAP</button>
-    <button class="btn btn-secondary" onclick="leaveGame()">← HOME</button>
+    <button class="btn btn-primary" onclick="window.playAgain()">PLAY AGAIN 🔄</button>
+    <button class="btn btn-secondary" onclick="window.showRecap()">📜 GAME RECAP</button>
+    <button class="btn btn-secondary" onclick="window.leaveGame()">← HOME</button>
   </div>
 </div>
 
@@ -1223,2122 +796,11 @@
     <div class="logo-wrap"><span class="logo" style="font-size: 48px; display:block; text-align:center;">SPITWIT</span></div>
     <div style="text-align:center;font-family:var(--font-display);font-size:28px;letter-spacing:3px;color:var(--accent2);margin-bottom:24px;">GAME RECAP</div>
     <div id="recap-list"></div>
-    <button class="btn btn-secondary" onclick="showScreen('screen-winner')" style="margin-top:8px;">← BACK TO RESULTS</button>
-    <button class="btn btn-primary" onclick="playAgain()">PLAY AGAIN 🔄</button>
+    <button class="btn btn-secondary" onclick="window.showScreen('screen-winner')" style="margin-top:8px;">← BACK TO RESULTS</button>
+    <button class="btn btn-primary" onclick="window.playAgain()">PLAY AGAIN 🔄</button>
   </div>
 </div>
 
-<script>
-// =====================================================
-//  SPITWIT — FULL GAME LOGIC
-// =====================================================
-
-// ===== 300+ PROMPTS =====
-const PROMPT_PACKS = {
-  party: [
-    "The worst thing to say at a birthday party",
-    "A rejected name for a new cocktail",
-    "What the DJ actually plays after everyone asks him to stop",
-    "The worst Uber rating explanation",
-    "What you find under the couch at a frat house",
-    "A bad reason to start a conga line",
-    "The most awkward thing to drop on the dance floor",
-    "What the bouncer is really writing in his notebook",
-    "A terrible theme for a bachelorette party",
-    "The world's most disappointing party trick",
-    "What people regret saying in the group chat",
-    "The least helpful thing to say to someone who's lost at a festival",
-    "A party game that ends friendships",
-    "The worst thing to find in the punch bowl",
-    "What the designated driver is secretly thinking",
-    "A terrible icebreaker question for a house party",
-    "The most passive-aggressive thing to write on a birthday card",
-    "A piñata filling that kills the mood",
-    "What the neighbor's complaint letter actually says",
-    "The worst plus-one to bring to a wedding",
-  ],
-  dark: [
-    "A cheerful name for something terrifying",
-    "What the skeleton in the closet is actually doing",
-    "The worst horoscope ever written",
-    "A bad time to discover your GPS is wrong",
-    "The world's most depressing motivational poster",
-    "What ghosts are really haunting people about",
-    "A terrible name for a crisis hotline",
-    "The last thing anyone wants to read on a fortune cookie",
-    "What's really inside a politician's briefcase",
-    "The most unsettling thing a child can say at dinner",
-    "A bad time to run out of Wi-Fi",
-    "What the dentist is actually thinking",
-    "The world's worst self-help book title",
-    "What happens when you mix up your therapist and your boss's email",
-    "A bad thing to discover mid-skydive",
-    "The saddest item on a to-do list",
-    "What heaven's Yelp reviews actually say",
-    "A terrible name for a funeral home",
-    "The most anticlimactic apocalypse scenario",
-    "What the fine print on your soul contract says",
-  ],
-  wholesome: [
-    "What grandma calls the internet",
-    "The most wholesome thing a golden retriever is thinking",
-    "A surprise gift that accidentally becomes someone's favorite thing",
-    "What the class hamster writes in its diary",
-    "The nicest possible reason someone's crying on a park bench",
-    "What a librarian dreams about",
-    "The cutest misunderstanding between two old people",
-    "What your houseplant would say if it could talk",
-    "A compliment so sincere it becomes awkward",
-    "What the mailman's highlight of his day is",
-    "The sweetest thing you could find in a lunchbox",
-    "What sunshine would say if it were a person",
-    "A bedtime story that's way too comforting",
-    "What the neighborhood squirrel has learned about humans",
-    "The best possible outcome of a wrong number",
-    "What puppies actually dream about",
-    "A thank you card that makes the recipient cry happy tears",
-    "What rain sounds like to someone who loves it",
-    "The most heartwarming reason someone learned to cook",
-    "What your childhood stuffed animal would say to you now",
-  ],
-};
-
-// ===== ALL 300+ PROMPTS =====
-const ALL_PROMPTS = [
-  // Party
-  ...PROMPT_PACKS.party,
-  // Dark
-  ...PROMPT_PACKS.dark,
-  // Wholesome
-  ...PROMPT_PACKS.wholesome,
-  // GENERAL BATCH
-  "A terrible first line of a novel",
-  "The most useless superpower",
-  "A rejected slogan for a fast food chain",
-  "What aliens are actually observing about Earth",
-  "The worst possible name for a children's book",
-  "What your pet is plotting while you're at work",
-  "A bad sign you've been on the internet too long",
-  "The most suspicious thing to Google at 3AM",
-  "A job title that sounds important but isn't",
-  "What robots complain about at their union meetings",
-  "The laziest solution to climate change",
-  "A terrible supervillain origin story",
-  "What really happens at the bottom of the ocean",
-  "The worst possible last words",
-  "A bad reason to call in sick",
-  "What the voices in your GPS really want",
-  "The most dangerous item at a garage sale",
-  "A rejected name for a pharmaceutical drug",
-  "What a time traveler would be most disappointed by",
-  "The least romantic thing to say during a proposal",
-  "A terrible pitch for a new TV show",
-  "What kids think adults do all day",
-  "The world's most boring superhero",
-  "A bad piece of advice from a fortune teller",
-  "What the Moon is hiding from us",
-  "The saddest emoji combination",
-  "A rejected Olympic sport",
-  "What Santa does in July",
-  "The worst way to break up with someone via emoji",
-  "A terrible name for a dating app",
-  "What happens when you sneeze with your eyes open",
-  "The most unhelpful warning label",
-  "A bad reason to become a pirate",
-  "What the first rule of a secret society should be",
-  "The worst thing to find in a fortune cookie",
-  "A terrible business idea that somehow gets funded",
-  "What ants are actually saying when they march",
-  "The most polite insult ever spoken",
-  "A bad substitute for sunscreen",
-  "What happens in the town where all the missing socks go",
-  "The worst possible name for a baby",
-  "A rejected slogan for a gym",
-  "What your search history would confess about you",
-  "The most awkward thing to order at a restaurant",
-  "A terrible self-defense move",
-  "What traffic cones dream about",
-  "The worst theme for a children's birthday party",
-  "A bad thing to say during a job interview",
-  "What clouds are made of, according to a five-year-old",
-  "The most useless item in a survival kit",
-  "A terrible name for a sports team",
-  "What an AI really thinks about humans",
-  "The least inspirational place to hang a motivational quote",
-  "A bad reason to start learning a new language",
-  "What fish talk about when humans aren't watching",
-  "The most unsettling way to greet a stranger",
-  "A terrible password that somehow becomes standard practice",
-  "What the last remaining pay phone is thinking",
-  "The worst way to announce a pregnancy",
-  "A rejected name for a new country",
-  "What parents think 'the cloud' is",
-  "The most unusual thing to collect",
-  "A terrible name for a life coach",
-  "What dreams would be about if they made more sense",
-  "The worst advice column response ever published",
-  "A bad slogan for a dentist office",
-  "What cavemen thought about our technology",
-  "The most disappointing magic trick",
-  "A terrible way to end a business email",
-  "What the elevator is judging you for",
-  "The worst addition to a pizza",
-  "A bad motivational speech opener",
-  "What a spider thinks every time you use a broom",
-  "The most ineffective diet",
-  "A terrible museum exhibit",
-  "What tourists misunderstand about your city",
-  "The worst ice cream flavor ever invented",
-  "A bad reason to become a doctor",
-  "What the moon sees on a typical Friday night",
-  "The most confusing thing about modern life",
-  "A terrible app idea that somehow gets 5 stars",
-  "What a parking meter would say if it could talk",
-  "The worst camping advice",
-  "A rejected mascot for a professional sports team",
-  "What the number 4 is insecure about",
-  "The most unnecessary life hack",
-  "A terrible name for a therapy practice",
-  "What dogs are really barking about",
-  "The worst possible sequel to a beloved film",
-  "A bad fortune for a Magic 8-Ball",
-  "What office plants witness every day",
-  "The most suspicious thing someone can say in a library",
-  "A terrible name for a yoga class",
-  "What teenagers think adulthood is like",
-  "The world's worst handshake",
-  "A bad reason to call the police",
-  "What would happen if elevators had Yelp reviews",
-  "The least helpful doctor's diagnosis",
-  "A terrible reason to quit your job",
-  "What vending machines are angry about",
-  "The most over-dramatic weather report",
-  "A bad slogan for a hot air balloon company",
-  "What happens when nobody is watching the Roomba",
-  "The worst travel souvenir",
-  "A terrible tagline for a mattress store",
-  "What mannequins discuss after closing time",
-  "The most awkward family photo caption",
-  "A bad idea for a mobile game",
-  "What the last dinosaur was thinking",
-  "The worst way to start a campfire story",
-  "A terrible children's toy recalled immediately",
-  "What your refrigerator knows about you",
-  "The most useless degree you could earn",
-  "A bad reason to become a vegetarian",
-  "What would happen if trees could walk",
-  "The worst possible Wi-Fi name",
-  "A terrible name for a charity",
-  "What pigeons are actually saying",
-  "The most terrifying knock-knock joke punchline",
-  "A bad item to put on a resume",
-  "What would happen if dogs could drive",
-  "The worst name for a restaurant",
-  "A terrible idea for a company retreat",
-  "What the sun thinks of us wearing sunscreen",
-  "The most anticlimactic treasure hunt reward",
-  "A bad name for a new country",
-  "What a shopping cart thinks as it rolls away in the parking lot",
-  "The worst possible tour guide script",
-  "A terrible reason to start a podcast",
-  "What happens in a town where everyone can read minds",
-  "The most unsettling greeting card message",
-  "A bad idea for a new holiday tradition",
-  "What office staplers gossip about",
-  "The worst name for a new planet",
-  "A terrible reason to call a meeting",
-  "What happens at the world's least exciting theme park",
-  "The most confusing street name in a city",
-  "A bad name for a cooking show",
-  "What icebergs are hiding below the surface",
-  "The worst piece of furniture ever invented",
-  "A terrible reason to join a cult",
-  "What would happen if shadows became sentient",
-  "The most suspicious thing on a grocery list",
-  "A bad add-on feature for a self-driving car",
-  "What coins in a wishing fountain wish for",
-  "The worst icebreaker for a support group",
-  "A terrible reality TV show concept",
-  "What happens in the secret society of people who wake up before 5AM",
-  "The most worrying thing to find in a library's lost and found",
-  "A bad line to open a best man speech",
-  "What the last rotary phone thinks of smartphones",
-  "The worst name for a craft beer",
-  "A terrible dating profile opener",
-  "What squirrels really do with all those acorns",
-  "The most suspicious thing written in a yearbook",
-  "A bad name for a cruise ship",
-  "What happens if you take astrology too literally",
-  "The worst possible theme for a school dance",
-  "A terrible way to end a TED talk",
-  "What the office microwave has seen",
-  "The most confusing thing about sleep",
-  "A bad marketing strategy for selling cheese",
-  "What would happen if hair grew back instantly after cutting",
-  "The worst hidden fee on a hotel bill",
-  "A terrible explanation for being late to a meeting",
-  "What traffic lights think about during rush hour",
-  "The most passive-aggressive office kitchen sign",
-  "A bad warning label for a trampoline",
-  "What a snowman thinks as spring arrives",
-  "The worst reality show for senior citizens",
-  "A terrible name for a perfume",
-  "What would happen if libraries could fine people for emotional overreactions",
-  "The most unnecessary invention of the last decade",
-  "A bad slogan for a moving company",
-  "What vegetables whisper to each other in the produce aisle",
-  "The worst name for a band",
-  "A terrible life lesson learned from social media",
-  "What would happen if dreams were publicly streamed",
-  "The most unfortunate autocorrect message",
-  "A bad name for a nonprofit",
-  "What escalators think about people who just stand there",
-  "The worst idea for a workout class",
-  "A terrible plot twist in an otherwise wholesome film",
-  "What the cursor thinks when you won't stop clicking",
-  "The most uncomfortable silence in history",
-  "A bad name for a meditation app",
-  "What would happen if people had loading screens",
-  "The worst way to discover your house is haunted",
-  "A terrible name for a new currency",
-  "What houseplants are silently judging you for",
-  "The most suspicious reason to know exactly how many steps you've taken today",
-  "A bad introduction at a networking event",
-  "What Siri secretly thinks of your questions",
-  "The worst career pivot from politician to influencer",
-  "A terrible way to describe your personality on a first date",
-  "What the barista is actually writing on your cup",
-  "The most passive-aggressive way to give a gift",
-  "A bad name for a power outage preparedness kit",
-  "What a city pigeon knows that you don't",
-  "The worst reason to quit a gym in January",
-  "A terrible name for a home security system",
-  "What the loading bar thinks about when it slows to 99%",
-  "The most useless piece of trivia you actually know",
-  "A bad name for a haircut",
-  "What an alarm clock thinks about on weekends",
-  "The worst motivational poster for a hospital waiting room",
-  "A terrible response to 'How are you?'",
-  "What would happen if résumés had to include embarrassing moments",
-  "The least impressive flex",
-  "A bad name for a co-working space",
-  "What a pothole thinks when a car hits it",
-  "The worst advice for someone starting a diet",
-  "A terrible name for a new airline",
-  "What would happen if every notification you ignored became sentient",
-  "The most elaborate excuse for forgetting a birthday",
-  "A bad slogan for a car dealership",
-  "What desk chairs know about their owners",
-  "The worst name for a startup",
-  "A terrible life lesson you learned way too late",
-  "What a grocery store cart thinks of self-checkout",
-  "The most overhyped thing about adulthood",
-  "A bad name for a home improvement show",
-  "What would happen if people had expiration dates printed on them",
-  "The worst possible thing to say to a coworker on Monday morning",
-  "A terrible reason to avoid going to the doctor",
-  "What happens when a robot becomes sentient during its shift at a call center",
-  "The most suspicious thing overheard on public transit",
-  "A bad name for a space mission",
-  "What would happen if your conscience had a Yelp page",
-  "The worst possible tourist attraction",
-  "A terrible tip jar message",
-  "What a cloud thinks right before it rains",
-  "The most politely devastating thing a teacher has written on a paper",
-  "A bad replacement for a GPS",
-  "What your bank statement says about your personality",
-  "The worst surprise ending to a children's story",
-  "A terrible name for a new Olympic event",
-  "What would happen if everyone could see each other's browser history",
-  "The most overdramatic way to quit a job",
-  "A bad slogan for a public library",
-  "What pigeons discuss at their annual summit",
-  "The worst life advice you've actually received",
-  "A terrible way to introduce yourself at a dinner party",
-  "What the moon actually thinks of the tides",
-  "The most over-engineered solution to a simple problem",
-  "A bad name for a social media platform",
-  "What would happen if every lie someone told turned their nose slightly red",
-  "The worst prank that accidentally becomes a tradition",
-  "A terrible alternative to coffee",
-  "What a smartphone notices about its owner that it would never say",
-  "The most unsettling thing about mirrors",
-  "A bad title for a self-published memoir",
-  "What would happen if music played automatically whenever you walked into a room",
-  "The worst reason to end a friendship",
-  "A terrible way to celebrate a promotion",
-  "What a broken umbrella thinks as it's thrown away",
-  "The most ambitious thing to do on a lazy Sunday",
-  "A bad slogan for sunscreen",
-  "What your college roommate remembers about you",
-  "The worst trend that started as a joke",
-  "A terrible reason to run for president",
-  "What a treadmill thinks during a New Year's resolution rush",
-  "The most underwhelming thing to go viral",
-  "A bad name for a political party",
-  "What would happen if people broadcast live commentary on their own life",
-  "The worst thing to find in your annual performance review",
-  "A terrible addition to a wedding vow",
-  "What would happen if office chairs could unionize",
-  "The most confusing thing about the English language",
-  "A bad replacement for a smoke alarm",
-  "What a broken ATM dreams about",
-  "The worst possible motivational quote on a gym wall",
-  "A terrible sequel to a beloved game show",
-  "What would happen if every meeting that could have been an email became a puppet show instead",
-  // BATCH 2 — 100 NEW PROMPTS
-  "The least intimidating gang name",
-  "A terrible slogan for a funeral livestream service",
-  "What your Uber driver actually thinks when you give 4 stars",
-  "The most passive-aggressive way to say you're fine",
-  "A bad reason to get a tattoo",
-  "What office printers are plotting",
-  "The worst thing to shout at a library",
-  "A rejected tagline for a water brand",
-  "What happens at the world's most boring heist",
-  "The worst possible ringtone for a job interview",
-  "A terrible name for a true crime podcast",
-  "What your Netflix algorithm knows about you that you don't",
-  "The least motivating gym name",
-  "A bad plot twist in a cooking competition",
-  "What escalator handrails think about all day",
-  "The worst thing to say while cutting someone's hair",
-  "A terrible reason to go on a reality dating show",
-  "What would happen if hiccups had a purpose",
-  "The most cursed thing to find in an Airbnb",
-  "A bad reason to start a neighborhood watch",
-  "What a lonely ATM thinks at 3AM",
-  "The worst surprise in a birthday cake",
-  "A terrible job for someone with no patience",
-  "What shopping mall food courts are actually serving",
-  "The most uncomfortable conversation to overhear in an elevator",
-  "A bad reason to move to another country",
-  "What happens when you let autocorrect write your wedding vows",
-  "The least romantic romantic comedy plot",
-  "A terrible mascot for a hospital",
-  "What hotel pillows have witnessed",
-  "The worst reason to call your ex",
-  "A bad name for a true crime documentary",
-  "What would happen if apologies had expiration dates",
-  "The most suspicious thing to order at a fast food drive-through at midnight",
-  "A terrible name for a twins",
-  "What the 'reply all' button would say if it could feel regret",
-  "The worst theme for a gender reveal",
-  "A bad reason to become a life coach",
-  "What your shadow does when you're not looking",
-  "The most overdressed occasion you could attend",
-  "A terrible warning label for a motivational book",
-  "What happens when a ghost can't figure out why they're still haunting",
-  "The most suspicious reason to cancel plans",
-  "A bad name for a luxury car",
-  "What the last piece of office birthday cake thinks",
-  "The worst possible class field trip destination",
-  "A terrible slogan for a mattress company",
-  "What would happen if texting was replaced with interpretive dance",
-  "The most anticlimactic thing to go to jail for",
-  "A bad name for a children's cartoon",
-  "What a weather app actually thinks about you constantly checking it",
-  "The worst possible way to announce you're vegan",
-  "A terrible addition to the school curriculum",
-  "What traffic jams are actually for",
-  "The most unnecessary product ever invented",
-  "A bad reason to challenge someone to a duel",
-  "What staplers say behind scissors' back",
-  "The worst place to have an epiphany",
-  "A terrible reason to learn a musical instrument",
-  "What ice cubes think as they slowly melt",
-  "The most unsettling children's song you could write",
-  "A bad excuse for forgetting someone's name",
-  "What happens in the waiting room of the afterlife",
-  "The worst thing your smart home device could say",
-  "A terrible name for a bakery",
-  "What paint watches people do in their homes",
-  "The most politely devastating rejection letter",
-  "A bad alternative to shaking hands",
-  "What would happen if every compliment had a disclaimer",
-  "The least impressive magic show",
-  "A terrible reason to move to a different seat on a plane",
-  "What a to-do list thinks of its creator",
-  "The worst hashtag to trend",
-  "A bad name for a streaming service",
-  "What would happen if people had to narrate their own lives out loud",
-  "The most unnecessary disclaimer",
-  "A terrible plot for a Pixar movie",
-  "What vending machine D7 thinks about never being chosen",
-  "The worst way to break the news you're moving away",
-  "A bad reason to write a strongly worded letter",
-  "What happens at the annual conference for forgotten passwords",
-  "The most suspicious thing to keep in your car",
-  "A terrible name for a detective agency",
-  "What a Wikipedia article thinks about being edited at 2AM",
-  "The worst way to describe your job at a party",
-  "A bad reason to knock on a stranger's door",
-  "What would happen if procrastination was an Olympic sport",
-  "The least effective battle cry",
-  "A terrible icebreaker for a job interview",
-  "What your immune system says when you finally get a good night's sleep",
-  "The worst possible way to say 'I love you' for the first time",
-  "A bad name for a chain of hotels",
-  "What happens when a motivational speaker loses all motivation",
-  "The most suspicious LinkedIn endorsement",
-  "A terrible reason to start a fire",
-  "What the snooze button thinks every morning",
-  "The worst possible thing to say in a job resignation letter",
-  "A bad name for a new country founded in your backyard",
-  "What would happen if every excuse you made became publicly visible",
-  "The most unnecessary celebrity beef",
-  "A terrible slogan for a dentist who just found out they hate teeth",
-];
-
-// Remove duplicates just in case
-const UNIQUE_PROMPTS = [...new Set(ALL_PROMPTS)];
-
-// ===== PERSONAL PROMPT TEMPLATES =====
-// Use [A] and [B] as placeholders for two different player names
-const PERSONAL_PROMPT_TEMPLATES = [
-  "What is [A] definitely hiding from their family?",
-  "The most likely reason [A] would get banned from a buffet",
-  "What [A] is actually doing when they say they're 'working from home'",
-  "The Wikipedia article [A] has read the most times",
-  "What [A]'s search history reveals about them",
-  "The most believable excuse [A] could give for being late",
-  "What [A]'s theme song would be, and why it's embarrassing",
-  "What [A] and [B] would argue about on a road trip",
-  "The business [A] would definitely start and immediately regret",
-  "What [A] would be arrested for in a Hallmark movie",
-  "The most likely thing [A] has lied about on a resume",
-  "What [A] orders at a restaurant that makes the waiter sigh",
-  "The superpower [A] would misuse immediately",
-  "What [A]'s diary entry from last Tuesday probably says",
-  "The red flag [A] displays that everyone politely ignores",
-  "What [A] and [B] would start a podcast about",
-  "The cult [A] would accidentally found",
-  "What [A] is definitely the villain of, but doesn't know it",
-  "The TV show [A]'s life is most like, and which character they are",
-  "What [A] would do with a million dollars in 48 hours",
-  "The award [A] would win at a work party that nobody wants",
-  "What [A] texts back immediately vs leaves on read for three days",
-  "The job [A] was born to do that doesn't exist yet",
-  "Why [A] and [B] would not survive together in an apocalypse",
-  "The thing [A] is weirdly competitive about",
-  "What [A]'s villain origin story is",
-  "The reality show [A] would absolutely win",
-  "What [A] would write in their Yelp review of heaven",
-  "The most [A] thing [A] has ever done",
-  "What [A] brings to every potluck no matter what",
-  "The hobby [A] picked up during lockdown that they pretend they still do",
-  "What [A]'s pet would say about them in a court of law",
-  "The conspiracy theory [A] secretly believes",
-  "What [A] says vs what [A] means",
-  "The career [A] would have in a medieval village",
-  "What [A] would rename themselves if they could",
-  "The most [A]-coded purchase ever made on Amazon",
-  "What [A] is doing right now instead of being productive",
-  "The thing [A] knows way too much about for no reason",
-  "What [A] and [B]'s buddy cop movie would be called",
-  "The most likely reason [A] has been blocked by someone",
-  "What [A] thinks about during an awkward silence",
-  "The talent show act [A] has been quietly rehearsing",
-  "What [A]'s autobiography would be titled",
-  "The era of history [A] would thrive in",
-  "What [A] definitely Googled after leaving this room",
-  "The most suspicious item on [A]'s grocery list",
-  "What [A]'s sleep paralysis demon looks like",
-  "The most passive-aggressive gift [A] has ever given",
-  "What [A] would do if they were invisible for a day",
-  "The reason [A] and [B] would get kicked off a game show",
-  "What [A]'s spirit animal says behind their back",
-  "The world record [A] could probably break without trying",
-  "What [A] argues about with strangers on the internet",
-  "The thing [A] does that they think nobody notices",
-  "What [A]'s warning label would say",
-  "The fake name [A] gives at Starbucks and why",
-  "What [A] is the patron saint of",
-  "The documentary Netflix would make about [A]",
-  "What [A] would say as their last words, and why it'd be embarrassing",
-  "The secret talent [A] definitely has but refuses to admit",
-];
-
-function generatePersonalPrompts(players) {
-  if (players.length < 2) return [];
-  const names = players.map(p => p.name);
-  const shuffledTemplates = [...PERSONAL_PROMPT_TEMPLATES].sort(() => Math.random() - 0.5);
-  return shuffledTemplates.map(template => {
-    const a = names[Math.floor(Math.random() * names.length)];
-    let b = names[Math.floor(Math.random() * names.length)];
-    let attempts = 0;
-    while (b === a && names.length > 1 && attempts++ < 10) b = names[Math.floor(Math.random() * names.length)];
-    return template.replace(/\[A\]/g, a).replace(/\[B\]/g, b);
-  });
-}
-
-// Build a personalized prompt list that guarantees every player is featured
-// at least once per round before anyone is repeated
-function buildPersonalizedPool(players, totalPromptsNeeded) {
-  const names = players.map(p => p.name);
-  const result = [];
-
-  // Group templates by whether they use [B] or just [A]
-  const soloTemplates = PERSONAL_PROMPT_TEMPLATES.filter(t => !t.includes('[B]'));
-  const duoTemplates  = PERSONAL_PROMPT_TEMPLATES.filter(t =>  t.includes('[B]'));
-
-  // We cycle through players in shuffled order, ensuring each gets featured
-  // before anyone repeats — like dealing cards
-  const shuffledTemplates = [...PERSONAL_PROMPT_TEMPLATES].sort(() => Math.random() - 0.5);
-
-  let templateIdx = 0;
-  let playerQueue = []; // replenished when empty
-
-  const nextPlayer = (exclude) => {
-    if (!playerQueue.length) playerQueue = [...names].sort(() => Math.random() - 0.5);
-    // make sure we don't immediately repeat the excluded name
-    if (exclude && playerQueue[0] === exclude && playerQueue.length > 1) {
-      playerQueue.push(playerQueue.shift());
-    }
-    return playerQueue.shift();
-  };
-
-  while (result.length < totalPromptsNeeded) {
-    if (templateIdx >= shuffledTemplates.length) {
-      // reshuffle and reuse if we need more prompts than templates
-      shuffledTemplates.sort(() => Math.random() - 0.5);
-      templateIdx = 0;
-    }
-    const template = shuffledTemplates[templateIdx++];
-    const a = nextPlayer(null);
-    const b = nextPlayer(a);
-    result.push(template.replace(/\[A\]/g, a).replace(/\[B\]/g, b));
-  }
-
-  return result;
-}
-
-// Interleave personal prompts into a regular pool so that within each round's
-// prompts, each player is featured at least once before any repeat
-function interleavePersonal(regularPool, personalPool, promptsPerRound, numPlayers) {
-  // How many personal prompts fit per round (at most all slots, at least 1 per player)
-  const personalPerRound = Math.min(promptsPerRound, numPlayers);
-  const regularPerRound  = promptsPerRound - personalPerRound;
-
-  const shuffledRegular  = [...regularPool].sort(() => Math.random() - 0.5);
-  const combined = [];
-  let regIdx = 0;
-  let perIdx = 0;
-
-  // We don't know total rounds yet, just build enough for a generous pool
-  const rounds = Math.ceil(shuffledRegular.length / Math.max(1, regularPerRound));
-  for (let r = 0; r < rounds && perIdx < personalPool.length; r++) {
-    // Add personal prompts for this round
-    for (let i = 0; i < personalPerRound && perIdx < personalPool.length; i++) {
-      combined.push(personalPool[perIdx++]);
-    }
-    // Fill remaining slots with regular prompts
-    for (let i = 0; i < regularPerRound && regIdx < shuffledRegular.length; i++) {
-      combined.push(shuffledRegular[regIdx++]);
-    }
-  }
-  // Append any leftover regular prompts
-  while (regIdx < shuffledRegular.length) combined.push(shuffledRegular[regIdx++]);
-  return combined;
-}
-
-// =====================================================
-//  DOODLE BACKGROUND
-// =====================================================
-(function() {
-  const doodles = ['💬','😂','✦','🎯','🔥','⚡','💥','🎉','👏','😈','🤣','💡','🎤','✌️','🃏'];
-  const bg = document.getElementById('doodle-bg');
-  if (!bg) return;
-  for (let i = 0; i < 18; i++) {
-    const el = document.createElement('span');
-    el.textContent = doodles[Math.floor(Math.random() * doodles.length)];
-    el.style.left = (Math.random() * 100) + '%';
-    el.style.animationDuration = (18 + Math.random() * 22) + 's';
-    el.style.animationDelay = -(Math.random() * 30) + 's';
-    el.style.fontSize = (20 + Math.random() * 24) + 'px';
-    bg.appendChild(el);
-  }
-})();
-
-// =====================================================
-//  GAME STATE
-// =====================================================
-let state = {
-  isHost: false,
-  peer: null,
-  connections: [],
-  players: [],    // [{id, name, score, prevScore}]
-  myId: null,
-  myName: '',
-  hostConn: null, // client's connection to host
-  gameSettings: {},
-  currentRound: 0,
-  totalRounds: 5,
-  prompts: [],
-  currentPromptIdx: 0,
-  answers: {},    // {playerId: answer}
-  votes: {},      // {voterId: answererPlayerId}
-  timerInterval: null,
-  phase: 'lobby', // lobby | answering | voting | results | scoreboard | winner
-  customPrompts: [],
-  myVote: null,
-  myAnswer: '',
-  answerSubmitted: false,
-  voteSubmitted: false,
-  recap: [],      // [{prompt, winner: {name, answer}, allAnswers: [{name, answer, votes}]}]
-};
-
-// =====================================================
-//  SCREEN MANAGEMENT
-// =====================================================
-function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.getElementById('tab-settings').style.display = 'none';
-  document.getElementById('tab-custom-prompts').style.display = 'none';
-  
-  if (tab === 'settings') {
-    document.getElementById('tab-settings').style.display = 'block';
-    document.querySelectorAll('.tab')[0].classList.add('active');
-  } else {
-    document.getElementById('tab-custom-prompts').style.display = 'block';
-    document.querySelectorAll('.tab')[1].classList.add('active');
-  }
-}
-
-// =====================================================
-//  CUSTOM PROMPTS
-// =====================================================
-function addCustomPrompt() {
-  const input = document.getElementById('custom-prompt-input');
-  const text = input.value.trim();
-  if (!text) return;
-  state.customPrompts.push(text);
-  input.value = '';
-  renderCustomPrompts();
-}
-
-function importPromptsFromFile(fileInput) {
-  const file = fileInput.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const lines = e.target.result.split(/\r?\n/);
-    let added = 0;
-    lines.forEach(line => {
-      const trimmed = line.trim();
-      if (trimmed) { state.customPrompts.push(trimmed); added++; }
-    });
-    fileInput.value = '';
-    renderCustomPrompts();
-    if (added > 0) notify(`✓ Added ${added} prompt${added !== 1 ? 's' : ''} from file`);
-  };
-  reader.readAsText(file);
-}
-
-function removeCustomPrompt(idx) {
-  state.customPrompts.splice(idx, 1);
-  renderCustomPrompts();
-}
-
-function renderCustomPrompts() {
-  const list = document.getElementById('custom-prompts-list');
-  const count = document.getElementById('custom-prompts-count');
-  count.textContent = `${state.customPrompts.length} custom prompt${state.customPrompts.length !== 1 ? 's' : ''} added`;
-  list.innerHTML = state.customPrompts.map((p, i) => `
-    <li class="custom-prompt-item">
-      <span>${p}</span>
-      <button onclick="removeCustomPrompt(${i})">×</button>
-    </li>
-  `).join('');
-}
-
-// =====================================================
-//  NOTIFICATIONS
-// =====================================================
-function notify(msg, duration = 2500) {
-  const el = document.createElement('div');
-  el.className = 'notification';
-  el.textContent = msg;
-  document.body.appendChild(el);
-  setTimeout(() => el.remove(), duration);
-}
-
-// =====================================================
-//  PEER SETUP
-// =====================================================
-function generateRoomCode() {
-  return Math.random().toString(36).substring(2, 6).toUpperCase();
-}
-
-function startHosting() {
-  const name = document.getElementById('host-name').value.trim();
-  if (!name) { alert('Enter your name first!'); return; }
-
-  state.isHost = true;
-  state.myName = name;
-  state.gameSettings = {
-    rounds: parseInt(document.getElementById('num-rounds').value),
-    answerTime: parseInt(document.getElementById('answer-time').value),
-    voteTime: parseInt(document.getElementById('vote-time').value),
-    promptPack: document.getElementById('prompt-pack').value,
-    includeCustom: document.getElementById('include-custom').checked,
-    customPrompts: [...state.customPrompts],
-    blindVoting: document.getElementById('blind-voting').checked,
-    readAloud: document.getElementById('read-aloud').checked,
-    hostDisplay: document.getElementById('host-display-mode').checked,
-    personalPrompts: document.getElementById('personal-prompts').checked,
-  };
-
-  const roomCode = generateRoomCode();
-  const peerId = 'spitwit-' + roomCode;
-
-  showScreen('screen-host-lobby');
-  document.getElementById('room-code-display').textContent = roomCode;
-  document.getElementById('host-connection-status').textContent = 'Connecting...';
-  document.getElementById('host-connection-status').className = 'status-badge status-waiting';
-
-  const peer = new Peer(peerId, { debug: 0 });
-  state.peer = peer;
-  state.myId = peerId;
-  state.players = [{ id: peerId, name, score: 0, prevScore: 0 }];
-
-  peer.on('open', () => {
-    document.getElementById('host-connection-status').textContent = '✓ Ready to accept players';
-    document.getElementById('host-connection-status').className = 'status-badge status-connected';
-    renderLobbyPlayers();
-  });
-
-  peer.on('connection', (conn) => {
-    conn.on('open', () => {
-      state.connections.push(conn);
-      conn.on('data', (data) => handleClientMessage(conn, data));
-      conn.on('close', () => handlePlayerDisconnect(conn));
-    });
-  });
-
-  peer.on('error', (err) => {
-    if (err.type === 'unavailable-id') {
-      // room code collision, retry
-      startHosting();
-    } else {
-      document.getElementById('host-connection-status').textContent = 'Connection error: ' + err.message;
-      document.getElementById('host-connection-status').className = 'status-badge status-error';
-    }
-  });
-}
-
-function handlePlayerDisconnect(conn) {
-  state.connections = state.connections.filter(c => c !== conn);
-  state.players = state.players.filter(p => p.id !== conn.peer);
-  renderLobbyPlayers();
-  notify(`A player disconnected`);
-}
-
-function handleClientMessage(conn, data) {
-  if (data.type === 'join') {
-    const player = { id: conn.peer, name: data.name, score: 0, prevScore: 0 };
-    state.players.push(player);
-    // broadcast updated player list
-    broadcastToAll({ type: 'player-list', players: state.players });
-    renderLobbyPlayers();
-    notify(`${data.name} joined!`);
-  }
-  if (data.type === 'answer') {
-    state.answers[conn.peer] = data.answer;
-    trackAnswerForTV(conn.peer);
-    checkAllAnswered();
-  }
-  if (data.type === 'vote') {
-    state.votes[conn.peer] = data.vote;
-    checkAllVoted();
-  }
-}
-
-function broadcastToAll(msg) {
-  state.connections.forEach(c => { try { c.send(msg); } catch(e) {} });
-}
-
-function sendToHost(msg) {
-  if (state.hostConn) { try { state.hostConn.send(msg); } catch(e) {} }
-}
-
-// ===== JOIN =====
-function joinGame() {
-  const name = document.getElementById('join-name').value.trim();
-  const code = document.getElementById('join-code').value.trim().toUpperCase();
-  if (!name) { alert('Enter your name!'); return; }
-  if (!code) { alert('Enter a room code!'); return; }
-
-  state.myName = name;
-  state.isHost = false;
-
-  const statusEl = document.getElementById('join-status');
-  statusEl.style.display = 'inline-block';
-  statusEl.textContent = 'Connecting...';
-  statusEl.className = 'status-badge status-waiting';
-
-  const peer = new Peer(undefined, { debug: 0 });
-  state.peer = peer;
-
-  peer.on('open', (id) => {
-    state.myId = id;
-    const hostId = 'spitwit-' + code;
-    const conn = peer.connect(hostId);
-    state.hostConn = conn;
-
-    conn.on('open', () => {
-      conn.send({ type: 'join', name });
-      statusEl.textContent = '✓ Connected!';
-      statusEl.className = 'status-badge status-connected';
-      
-      document.getElementById('player-wait-name').textContent = `You're in as "${name}"`;
-      showScreen('screen-player-wait');
-    });
-
-    conn.on('data', (data) => handleHostMessage(data));
-    
-    conn.on('error', (e) => {
-      statusEl.textContent = 'Connection failed. Check the room code.';
-      statusEl.className = 'status-badge status-error';
-    });
-
-    conn.on('close', () => {
-      notify('Disconnected from host');
-      leaveGame();
-    });
-  });
-
-  peer.on('error', (err) => {
-    statusEl.textContent = 'Failed: ' + err.message;
-    statusEl.className = 'status-badge status-error';
-  });
-}
-
-function handleHostMessage(data) {
-  switch(data.type) {
-    case 'player-list':
-      state.players = data.players;
-      renderWaitPlayers();
-      break;
-    case 'game-start':
-      state.gameSettings = data.settings;
-      state.totalRounds = data.settings.rounds;
-      state.players = data.players;
-      state.recap = [];
-      break;
-    case 'round-start':
-      state.currentRound = data.round;
-      state.currentPromptIdx = data.promptIdx;
-      break;
-    case 'prompt':
-      startAnsweringPhase(data.prompt, data.round, data.promptIdx, data.totalPrompts);
-      break;
-    case 'voting':
-      startVotingPhase(data.prompt, data.answers, data.round, data.promptIdx, data.totalPrompts);
-      break;
-    case 'results':
-      if (data.recapEntry) state.recap.push(data.recapEntry);
-      showResultsPhase(data.prompt, data.answers, data.votes, data.scores);
-      break;
-    case 'scoreboard':
-      showScoreboardPhase(data.players, false);
-      break;
-    case 'winner':
-      showWinnerPhase(data.players);
-      break;
-  }
-}
-
-// =====================================================
-//  LOBBY
-// =====================================================
-function renderLobbyPlayers() {
-  const list = document.getElementById('lobby-player-list');
-  const count = document.getElementById('player-count');
-  list.innerHTML = state.players.map(p =>
-    `<div class="player-chip"><div class="dot"></div>${p.name}${p.id === state.myId ? ' (you)' : ''}</div>`
-  ).join('');
-  count.textContent = state.players.length;
-  const code = document.getElementById('room-code-display').textContent;
-  tvUpdate('lobby', { players: state.players, roomCode: code });
-}
-
-function renderWaitPlayers() {
-  const list = document.getElementById('wait-player-list');
-  list.innerHTML = state.players.map(p =>
-    `<div class="player-chip"><div class="dot"></div>${p.name}${p.id === state.myId ? ' (you)' : ''}</div>`
-  ).join('');
-}
-
-function copyRoomCode() {
-  const code = document.getElementById('room-code-display').textContent;
-  navigator.clipboard.writeText(code).then(() => notify('Room code copied! 📋'));
-}
-
-// =====================================================
-//  GAME FLOW (HOST)
-// =====================================================
-function hostStartGame() {
-  if (state.players.length < 2) { alert('Need at least 2 players!'); return; }
-  
-  // Build prompt pool
-  const settings = state.gameSettings;
-  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
-  const totalPromptsNeeded = settings.rounds * promptsPerRound;
-
-  let pool;
-  if (settings.promptPack === 'personalized') {
-    // Full personalized mode: every prompt features a player, guaranteed round-robin coverage
-    pool = buildPersonalizedPool(state.players, totalPromptsNeeded);
-    shuffle(pool);
-    state.prompts = pool.slice(0, totalPromptsNeeded);
-    state.totalRounds = settings.rounds;
-    state.currentRound = 0;
-    state.currentPromptIdx = 0;
-    state.recap = [];
-    broadcastToAll({ type: 'game-start', settings, players: state.players });
-    if (state.gameSettings.hostDisplay) {
-      document.getElementById('host-display-btn').classList.add('visible');
-      openHostDisplay();
-    }
-    hostNextPrompt();
-    return;
-  }
-
-  if (settings.promptPack === 'all') pool = [...UNIQUE_PROMPTS];
-  else if (settings.promptPack === 'custom-only') pool = [...(settings.customPrompts || [])];
-  else pool = [...(PROMPT_PACKS[settings.promptPack] || UNIQUE_PROMPTS)];
-
-  if (settings.includeCustom && settings.customPrompts?.length) {
-    pool = [...pool, ...settings.customPrompts];
-  }
-
-  // Inject personal prompts — guarantee each player featured at least once per round
-  if (settings.personalPrompts && state.players.length >= 2) {
-    // Build enough personal prompts to cover one per player per round
-    const personalNeeded = settings.rounds * state.players.length;
-    const personalPool = buildPersonalizedPool(state.players, personalNeeded);
-    // Shuffle and interleave: put one personal prompt every N slots
-    pool = interleavePersonal(pool, personalPool, promptsPerRound, state.players.length);
-  }
-
-  shuffle(pool);
-  state.prompts = pool.slice(0, totalPromptsNeeded);
-  state.totalRounds = settings.rounds;
-  state.currentRound = 0;
-  state.currentPromptIdx = 0;
-  state.recap = [];
-
-  broadcastToAll({ type: 'game-start', settings, players: state.players });
-  if (state.gameSettings.hostDisplay) {
-    document.getElementById('host-display-btn').classList.add('visible');
-    openHostDisplay();
-  }
-  hostNextPrompt();
-}
-
-function hostNextPrompt() {
-  state.answers = {};
-  state.votes = {};
-  state.myAnswer = '';
-  state.myVote = null;
-  state.answerSubmitted = false;
-  state.voteSubmitted = false;
-
-  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
-  const totalPrompts = state.totalRounds * promptsPerRound;
-
-  if (state.currentPromptIdx >= state.prompts.length) {
-    hostShowFinalWinner();
-    return;
-  }
-
-  const prompt = state.prompts[state.currentPromptIdx];
-  state.currentRound = Math.floor(state.currentPromptIdx / promptsPerRound) + 1;
-  const roundPromptIdx = (state.currentPromptIdx % promptsPerRound) + 1;
-
-  broadcastToAll({ type: 'prompt', prompt, round: state.currentRound, promptIdx: roundPromptIdx, totalPrompts: promptsPerRound });
-  startAnsweringPhase(prompt, state.currentRound, roundPromptIdx, promptsPerRound);
-
-  // Start answer timer
-  clearTimer();
-  let t = state.gameSettings.answerTime;
-  state.timerInterval = setInterval(() => {
-    t--;
-    if (t <= 0) {
-      clearTimer();
-      // Fill any missing answers
-      state.players.forEach(p => {
-        if (!state.answers[p.id]) state.answers[p.id] = '(no answer)';
-      });
-      hostStartVoting();
-    }
-  }, 1000);
-}
-
-function checkAllAnswered() {
-  const answered = state.players.every(p => state.answers[p.id] !== undefined);
-  if (answered) {
-    clearTimer();
-    hostStartVoting();
-  }
-}
-
-function hostStartVoting() {
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  const prompt = state.prompts[state.currentPromptIdx];
-  // Build answers list for voting (exclude own answer from voting)
-  const answersArr = state.players.map(p => ({ playerId: p.id, answer: state.answers[p.id] || '(no answer)' }));
-  
-  broadcastToAll({ type: 'voting', prompt, answers: answersArr });
-  
-  // Show voting to host too (they vote as a player)
-  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
-  startVotingPhase(prompt, answersArr, state.currentRound, (state.currentPromptIdx % promptsPerRound) + 1, promptsPerRound);
-
-  // Vote timer
-  let t = state.gameSettings.voteTime;
-  state.timerInterval = setInterval(() => {
-    t--;
-    if (t <= 0) {
-      clearTimer();
-      hostTallyVotes();
-    }
-  }, 1000);
-}
-
-function checkAllVoted() {
-  const voted = state.players.every(p => state.votes[p.id] !== undefined);
-  if (voted) {
-    clearTimer();
-    hostTallyVotes();
-  }
-}
-
-function hostTallyVotes() {
-  // Include host vote
-  if (state.myVote) state.votes[state.myId] = state.myVote;
-  
-  const prompt = state.prompts[state.currentPromptIdx];
-  const answersArr = state.players.map(p => ({ playerId: p.id, answer: state.answers[p.id] || '(no answer)' }));
-
-  // Count votes
-  const voteCounts = {};
-  Object.values(state.votes).forEach(votedFor => {
-    voteCounts[votedFor] = (voteCounts[votedFor] || 0) + 1;
-  });
-
-  // Award points
-  state.players.forEach(p => {
-    p.prevScore = p.score;
-    const votes = voteCounts[p.id] || 0;
-    p.score += votes * 500;
-  });
-
-  const scores = {};
-  state.players.forEach(p => scores[p.id] = p.score);
-
-  // Track for recap
-  const voteCounts2 = {};
-  Object.values(state.votes).forEach(v => { voteCounts2[v] = (voteCounts2[v] || 0) + 1; });
-  const maxVotes2 = Math.max(...Object.values(voteCounts2), 0);
-  const recapEntry = {
-    prompt,
-    allAnswers: answersArr.map(a => {
-      const player = state.players.find(p => p.id === a.playerId);
-      return { name: player?.name || '?', answer: a.answer, votes: voteCounts2[a.playerId] || 0 };
-    }),
-    winner: (() => {
-      const winnerId = Object.entries(voteCounts2).sort((a,b) => b[1]-a[1])[0]?.[0];
-      const winnerAnswer = answersArr.find(a => a.playerId === winnerId);
-      const winnerPlayer = state.players.find(p => p.id === winnerId);
-      return maxVotes2 > 0 ? { name: winnerPlayer?.name || '?', answer: winnerAnswer?.answer || '' } : null;
-    })()
-  };
-  state.recap.push(recapEntry);
-
-  broadcastToAll({ type: 'results', prompt, answers: answersArr, votes: state.votes, scores, recapEntry });
-  showResultsPhase(prompt, answersArr, state.votes, scores);
-}
-
-function hostNextRound() {
-  state.currentPromptIdx++;
-  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
-  const newRound = Math.floor(state.currentPromptIdx / promptsPerRound) + 1;
-
-  if (state.currentPromptIdx >= state.prompts.length || newRound > state.totalRounds) {
-    hostShowFinalWinner();
-    return;
-  }
-
-  // Show scoreboard between rounds
-  const endOfPrevRound = state.currentPromptIdx % promptsPerRound === 0;
-  if (endOfPrevRound) {
-    broadcastToAll({ type: 'scoreboard', players: state.players });
-    showScoreboardPhase(state.players, true);
-  } else {
-    hostNextPrompt();
-  }
-}
-
-function hostContinue() {
-  hostNextPrompt();
-}
-
-function hostShowFinalWinner() {
-  const sorted = [...state.players].sort((a, b) => b.score - a.score);
-  broadcastToAll({ type: 'winner', players: sorted });
-  showWinnerPhase(sorted);
-}
-
-// =====================================================
-//  ANSWERING PHASE
-// =====================================================
-function startAnsweringPhase(prompt, round, promptIdx, totalPrompts) {
-  state.answerSubmitted = false;
-  state.myAnswer = '';
-  
-  document.getElementById('answer-round-badge').textContent = `ROUND ${round} · PROMPT ${promptIdx} OF ${totalPrompts}`;
-  document.getElementById('answer-prompt-text').textContent = prompt;
-  document.getElementById('answer-for-label').textContent = 'YOUR PROMPT';
-  document.getElementById('answer-input').value = '';
-  document.getElementById('answer-input').disabled = false;
-  document.getElementById('submit-answer-btn').style.display = 'block';
-  document.getElementById('answer-submitted-msg').style.display = 'none';
-  showScreen('screen-answer');
-  tvUpdate('answering', { prompt, round, promptIdx, totalPrompts, players: state.players, timerTotal: state.gameSettings?.answerTime || 60 });
-
-  // Timer display
-  const total = state.gameSettings?.answerTime || 60;
-  let t = total;
-  document.getElementById('answer-timer').textContent = t;
-  document.getElementById('answer-timer-bar').style.width = '100%';
-
-  if (!state.isHost) {
-    // Client-side timer display
-    const ti = setInterval(() => {
-      t--;
-      document.getElementById('answer-timer').textContent = Math.max(0, t);
-      document.getElementById('answer-timer-bar').style.width = (Math.max(0, t) / total * 100) + '%';
-      if (t <= 0) clearInterval(ti);
-    }, 1000);
-    state.timerInterval = ti;
-  } else {
-    // Host controls real timer, but also show countdown
-    const ti = setInterval(() => {
-      t--;
-      document.getElementById('answer-timer').textContent = Math.max(0, t);
-      document.getElementById('answer-timer-bar').style.width = (Math.max(0, t) / total * 100) + '%';
-      if (t <= 0) clearInterval(ti);
-    }, 1000);
-  }
-}
-
-function submitAnswer() {
-  const answer = document.getElementById('answer-input').value.trim();
-  if (!answer) { notify('Type an answer first!'); return; }
-  
-  state.myAnswer = answer;
-  state.answerSubmitted = true;
-  document.getElementById('answer-input').disabled = true;
-  document.getElementById('submit-answer-btn').style.display = 'none';
-  document.getElementById('answer-submitted-msg').style.display = 'block';
-
-  if (state.isHost) {
-    state.answers[state.myId] = answer;
-    trackAnswerForTV(state.myId);
-    checkAllAnswered();
-  } else {
-    sendToHost({ type: 'answer', answer });
-  }
-}
-
-// =====================================================
-//  VOTING PHASE
-// =====================================================
-function startVotingPhase(prompt, answers, round, promptIdx, totalPrompts) {
-  state.voteSubmitted = false;
-  state.myVote = null;
-
-  const isBlind = state.gameSettings?.blindVoting;
-  const doReadAloud = state.gameSettings?.readAloud;
-
-  document.getElementById('vote-round-badge').textContent = `ROUND ${round} · VOTE!`;
-  document.getElementById('vote-prompt-text').textContent = prompt;
-  document.getElementById('vote-submit-btn').style.display = 'block';
-  document.getElementById('vote-submitted-msg').style.display = 'none';
-
-  // Blind badge
-  document.getElementById('blind-vote-badge').style.display = isBlind ? 'block' : 'none';
-
-  // Render answers — hide names if blind voting
-  const list = document.getElementById('vote-answers-list');
-  list.innerHTML = answers.map((a, idx) => {
-    const isOwn = a.playerId === state.myId;
-    const player = state.players.find(p => p.id === a.playerId);
-    const nameHtml = isBlind
-      ? (isOwn ? '<span style="color:var(--muted);font-size:12px;">YOUR ANSWER</span>' : '')
-      : `<span style="color:var(--muted);font-size:12px;">${isOwn ? 'YOUR ANSWER' : (player?.name || '')}</span>`;
-    return `
-      <div class="answer-item ${isOwn ? 'own-answer' : ''}" 
-           id="vote-opt-${a.playerId}"
-           onclick="${isOwn ? 'notify("You can\'t vote for yourself!")' : `selectVote('${a.playerId}')`}">
-        <span>${a.answer}</span>
-        ${nameHtml}
-      </div>
-    `;
-  }).join('');
-
-  showScreen('screen-vote');
-
-  // Update TV display if open
-  tvUpdate('voting', { prompt, answers, players: state.players, isBlind, round, timerTotal: state.gameSettings?.voteTime || 30 });
-
-  const total = state.gameSettings?.voteTime || 30;
-  let t = total;
-  document.getElementById('vote-timer').textContent = t;
-  document.getElementById('vote-timer-bar').style.width = '100%';
-  const ti = setInterval(() => {
-    t--;
-    document.getElementById('vote-timer').textContent = Math.max(0, t);
-    document.getElementById('vote-timer-bar').style.width = (Math.max(0, t) / total * 100) + '%';
-    tvUpdateTimer('vote', t, total);
-    if (t <= 0) clearInterval(ti);
-  }, 1000);
-  state.timerInterval = ti;
-
-  // Read answers aloud with TTS
-  if (doReadAloud && 'speechSynthesis' in window) {
-    readAnswersAloud(prompt, answers);
-  }
-}
-
-function selectVote(playerId) {
-  if (state.voteSubmitted) return;
-  state.myVote = playerId;
-  document.querySelectorAll('.answer-item').forEach(el => el.classList.remove('selected'));
-  const el = document.getElementById('vote-opt-' + playerId);
-  if (el) el.classList.add('selected');
-}
-
-function submitVote() {
-  if (!state.myVote) { notify('Select an answer to vote for!'); return; }
-  state.voteSubmitted = true;
-  // Stop TTS if still reading
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  document.getElementById('tts-indicator').style.display = 'none';
-  document.getElementById('vote-submit-btn').style.display = 'none';
-  document.getElementById('vote-submitted-msg').style.display = 'block';
-
-  if (state.isHost) {
-    state.votes[state.myId] = state.myVote;
-    checkAllVoted();
-  } else {
-    sendToHost({ type: 'vote', vote: state.myVote });
-  }
-}
-
-// =====================================================
-//  RESULTS PHASE
-// =====================================================
-function showResultsPhase(prompt, answers, votes, scores) {
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  const ttsBar = document.getElementById('tts-indicator');
-  if (ttsBar) ttsBar.style.display = 'none';
-  document.getElementById('results-prompt-text').textContent = prompt;
-
-  // Count votes per answer
-  const voteCounts = {};
-  Object.values(votes).forEach(v => { voteCounts[v] = (voteCounts[v] || 0) + 1; });
-  const maxVotes = Math.max(...Object.values(voteCounts), 0);
-
-  const container = document.getElementById('results-answers');
-  container.innerHTML = answers.map(a => {
-    const vCount = voteCounts[a.playerId] || 0;
-    const player = state.players.find(p => p.id === a.playerId);
-    const isWinner = vCount === maxVotes && vCount > 0;
-    // Always reveal names in results, even after blind voting
-    return `
-      <div class="vote-option ${isWinner ? 'winning' : (vCount === 0 && maxVotes > 0 ? 'losing' : '')}">
-        <div>${a.answer}</div>
-        <div class="voter-name">${player?.name || 'Unknown'}</div>
-        <div class="vote-count">${vCount}</div>
-        <div style="font-size:12px;color:var(--muted);">${vCount === 1 ? 'vote' : 'votes'}</div>
-      </div>
-    `;
-  }).join('');
-
-  document.getElementById('results-next-area').style.display = state.isHost ? 'block' : 'none';
-  document.getElementById('results-wait-area').style.display = state.isHost ? 'none' : 'block';
-
-  showScreen('screen-results');
-
-  // Update TV display with full results (names revealed)
-  tvUpdate('results', { prompt, answers, votes: voteCounts, players: state.players, maxVotes });
-}
-
-// =====================================================
-//  SCOREBOARD
-// =====================================================
-function showScoreboardPhase(players, isHost) {
-  const sorted = [...players].sort((a, b) => b.score - a.score);
-  const ranks = ['gold', 'silver', 'bronze'];
-
-  const list = document.getElementById('score-list');
-  list.innerHTML = sorted.map((p, i) => {
-    const delta = p.score - (p.prevScore || 0);
-    return `
-      <li class="score-item">
-        <div class="score-rank ${ranks[i] || ''}">${i + 1}</div>
-        <div class="score-name">${p.name}${p.id === state.myId ? ' 👤' : ''}</div>
-        <div class="score-delta">${delta > 0 ? '+' + delta : ''}</div>
-        <div class="score-pts">${p.score}</div>
-      </li>
-    `;
-  }).join('');
-
-  document.getElementById('scoreboard-badge').textContent = `AFTER ROUND ${state.currentRound}`;
-  document.getElementById('scoreboard-next-area').style.display = isHost ? 'block' : 'none';
-  document.getElementById('scoreboard-wait-area').style.display = isHost ? 'none' : 'block';
-  showScreen('screen-scoreboard');
-  tvUpdate('scoreboard', { players: sorted, round: state.currentRound });
-}
-
-// =====================================================
-//  WINNER SCREEN
-// =====================================================
-function showWinnerPhase(players) {
-  const sorted = [...players].sort((a, b) => b.score - a.score);
-  const winner = sorted[0];
-  const ranks = ['gold', 'silver', 'bronze'];
-
-  document.getElementById('winner-name').textContent = `🏆 ${winner.name} WINS!`;
-  document.getElementById('winner-score').textContent = `${winner.score} points`;
-
-  const list = document.getElementById('final-score-list');
-  list.innerHTML = sorted.map((p, i) => `
-    <li class="score-item">
-      <div class="score-rank ${ranks[i] || ''}">${i + 1}</div>
-      <div class="score-name">${p.name}${p.id === state.myId ? ' 👤' : ''}</div>
-      <div class="score-pts">${p.score}</div>
-    </li>
-  `).join('');
-
-  showScreen('screen-winner');
-  tvUpdate('winner', { players: sorted });
-}
-
-function showRecap() {
-  const container = document.getElementById('recap-list');
-  if (!state.recap || state.recap.length === 0) {
-    container.innerHTML = '<p class="text-muted" style="text-align:center;padding:20px;">No recap data yet — play a full game first!</p>';
-    showScreen('screen-recap');
-    return;
-  }
-
-  container.innerHTML = state.recap.map((entry, i) => {
-    const answersHtml = entry.allAnswers
-      .sort((a, b) => b.votes - a.votes)
-      .map(a => {
-        const isWinner = entry.winner && a.answer === entry.winner.answer && a.name === entry.winner.name;
-        return `
-          <div class="recap-answer ${isWinner ? 'recap-answer-winner' : ''}">
-            <span class="recap-answer-text">${a.answer}</span>
-            <span class="recap-answer-meta">${a.name} · ${a.votes} ${a.votes === 1 ? 'vote' : 'votes'}${isWinner ? ' 🏆' : ''}</span>
-          </div>`;
-      }).join('');
-
-    return `
-      <div class="card recap-card">
-        <div class="recap-prompt-num">PROMPT ${i + 1}</div>
-        <div class="recap-prompt-text">${entry.prompt}</div>
-        ${answersHtml}
-      </div>`;
-  }).join('');
-
-  showScreen('screen-recap');
-}
-
-// =====================================================
-//  UTILS
-// =====================================================
-function clearTimer() {
-  if (state.timerInterval) {
-    clearInterval(state.timerInterval);
-    state.timerInterval = null;
-  }
-}
-
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-function leaveGame() {
-  clearTimer();
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-  if (tvWindow && !tvWindow.closed) tvWindow.close();
-  tvWindow = null;
-  document.getElementById('host-display-btn').classList.remove('visible');
-  if (state.peer) { state.peer.destroy(); state.peer = null; }
-  state = {
-    isHost: false, peer: null, connections: [], players: [], myId: null,
-    myName: '', hostConn: null, gameSettings: {}, currentRound: 0,
-    totalRounds: 5, prompts: [], currentPromptIdx: 0, answers: {}, votes: {},
-    timerInterval: null, phase: 'lobby', customPrompts: state.customPrompts || [],
-    myVote: null, myAnswer: '', answerSubmitted: false, voteSubmitted: false,
-  };
-  showScreen('screen-home');
-}
-
-function playAgain() {
-  leaveGame();
-  showScreen('screen-host-setup');
-}
-
-// Enter key support for join
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') {
-    const active = document.querySelector('.screen.active');
-    if (active?.id === 'screen-join') joinGame();
-  }
-});
-
-// Auto-uppercase join code
-document.addEventListener('DOMContentLoaded', () => {
-  const codeInput = document.getElementById('join-code');
-  if (codeInput) codeInput.addEventListener('input', () => { codeInput.value = codeInput.value.toUpperCase(); });
-});
-
-// =====================================================
-//  TV HOST DISPLAY ENGINE
-// =====================================================
-let tvWindow = null;
-
-function openHostDisplay() {
-  // Open a new window and render the TV display inside it using postMessage
-  tvWindow = window.open('', 'SpitWitTV', 'width=1280,height=720,menubar=no,toolbar=no,location=no');
-  if (!tvWindow) { notify('Allow popups to use TV mode!'); return; }
-
-  tvWindow.document.write(`<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>SPITWIT — TV Display</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Boogaloo&family=Nunito:wght@400;700;800&display=swap');
-  :root {
-    --bg:#0e0b1a;--surface:#17132a;--surface2:#1f1a35;
-    --accent:#ff4757;--accent2:#ffd32a;--accent3:#a8ff3e;--accent4:#ff6b9d;
-    --text:#f5f0ff;--muted:#7a6fa0;--border:#3d3570;--ink:#1a0a3e;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;overflow:hidden;position:relative;}
-  body::before{content:'';position:fixed;inset:0;background:
-    radial-gradient(ellipse 70% 50% at 15% 15%,rgba(255,71,87,0.07) 0%,transparent 60%),
-    radial-gradient(ellipse 60% 50% at 85% 75%,rgba(168,255,62,0.05) 0%,transparent 60%);
-    pointer-events:none;z-index:0;}
-  /* Floating doodles */
-  .doodle{position:fixed;pointer-events:none;z-index:0;inset:0;overflow:hidden;}
-  .doodle span{position:absolute;opacity:0.05;animation:fdoodle linear infinite;font-size:36px;}
-  @keyframes fdoodle{0%{transform:translateY(110vh) rotate(0deg);opacity:0}10%{opacity:0.05}90%{opacity:0.05}100%{transform:translateY(-10vh) rotate(360deg);opacity:0}}
-  .wrap{position:relative;z-index:1;max-width:1400px;margin:0 auto;padding:40px;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-  /* Logo */
-  .logo{font-family:'Boogaloo',cursive;font-size:64px;color:var(--accent2);text-align:center;
-    text-shadow:4px 4px 0 var(--ink),-2px -2px 0 var(--ink),2px -2px 0 var(--ink),-2px 2px 0 var(--ink),0 8px 0 rgba(255,71,87,0.5);
-    transform:rotate(-1deg);display:inline-block;letter-spacing:2px;}
-  .phase{font-family:'Boogaloo',cursive;font-size:24px;letter-spacing:3px;color:var(--muted);margin:8px 0 20px;text-align:center;text-transform:uppercase;}
-  /* Prompt box — speech bubble style */
-  .prompt-box{background:var(--surface);border:3px solid var(--accent);border-radius:20px;padding:30px 40px;text-align:center;margin-bottom:24px;width:100%;max-width:1000px;font-size:clamp(22px,3vw,40px);font-weight:800;line-height:1.4;position:relative;box-shadow:6px 6px 0 rgba(255,71,87,0.35);}
-  .prompt-box::before{content:'💬';position:absolute;top:-18px;left:18px;font-size:38px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));}
-  /* Answer cards */
-  .answers{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;width:100%;max-width:1200px;}
-  .answer-card{background:var(--surface);border:3px solid var(--border);border-radius:16px;padding:28px 22px;font-size:clamp(16px,2vw,26px);font-weight:700;line-height:1.4;text-align:center;min-height:100px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:all 0.5s ease;box-shadow:4px 4px 0 var(--border);}
-  .answer-card.revealed{border-color:var(--accent3);background:rgba(168,255,62,0.06);box-shadow:4px 4px 0 var(--accent3);}
-  .answer-card.winner{border-color:var(--accent2);background:rgba(255,211,42,0.1);box-shadow:6px 6px 0 var(--accent2);}
-  .answer-card .pname{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:none;font-weight:800;}
-  .answer-card.revealed .pname,.answer-card.winner .pname{display:block;color:var(--accent3);}
-  .answer-card.winner .pname{color:var(--accent2);}
-  .vcount{font-family:'Boogaloo',cursive;font-size:58px;color:var(--accent2);display:none;text-shadow:3px 3px 0 rgba(0,0,0,0.4);}
-  .answer-card.revealed .vcount,.answer-card.winner .vcount{display:block;}
-  /* Timer */
-  .timer{font-family:'Boogaloo',cursive;font-size:100px;color:var(--accent2);line-height:1;margin:10px 0;text-shadow:5px 5px 0 var(--ink),0 8px 0 rgba(255,71,87,0.4);}
-  /* Room code */
-  .room-code{font-family:'Boogaloo',cursive;font-size:90px;letter-spacing:14px;color:var(--accent2);margin:16px 0 6px;text-shadow:5px 5px 0 var(--ink),0 8px 0 rgba(255,71,87,0.4);}
-  /* Player chips */
-  .chips{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;margin-top:20px;}
-  .chip{background:var(--surface2);border:2.5px solid var(--border);border-radius:100px;padding:10px 24px;font-size:18px;font-weight:700;box-shadow:3px 3px 0 var(--border);}
-  .chip.done{border-color:var(--accent3);color:var(--accent3);box-shadow:3px 3px 0 var(--accent3);}
-  /* Scoreboard */
-  .score-list{width:100%;max-width:700px;list-style:none;}
-  .score-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:2px dashed var(--border);font-size:22px;}
-  .score-rank{font-family:'Boogaloo',cursive;font-size:40px;width:54px;color:var(--muted);text-shadow:2px 2px 0 rgba(0,0,0,0.3);}
-  .score-rank.gold{color:var(--accent2)}.score-rank.silver{color:#c8c8d4}.score-rank.bronze{color:#cd7f32}
-  .score-pts{font-family:'Boogaloo',cursive;font-size:40px;color:var(--accent3);margin-left:auto;text-shadow:2px 2px 0 rgba(0,0,0,0.4);}
-  /* Winner */
-  .winner-banner{font-family:'Boogaloo',cursive;font-size:90px;color:var(--accent2);text-align:center;
-    text-shadow:5px 5px 0 var(--ink),-2px -2px 0 var(--ink),0 8px 0 rgba(255,71,87,0.5),0 16px 30px rgba(255,211,42,0.3);
-    animation:wpop 0.6s cubic-bezier(0.34,1.56,0.64,1);}
-  @keyframes wpop{from{transform:scale(0.5) rotate(-5deg);opacity:0}to{transform:scale(1) rotate(0);opacity:1}}
-  /* Blind badge */
-  .blind-badge{background:rgba(255,71,87,0.15);border:2px solid rgba(255,71,87,0.4);color:var(--accent);padding:5px 18px;border-radius:100px;font-size:14px;letter-spacing:1px;text-transform:uppercase;font-weight:800;margin-bottom:14px;display:inline-block;}
-</style>
-</head>
-<body>
-<div class="doodle" id="doodles"></div>
-<div class="wrap"><div id="tv" style="width:100%;text-align:center;display:flex;flex-direction:column;align-items:center;">
-  <div class="logo">SPITWIT</div>
-  <div class="phase">LOADING...</div>
-</div></div>
-<script>
-  // Spawn floating doodles
-  (function(){
-    const emojis=['💬','😂','✦','🎯','🔥','⚡','💥','🎉','👏','😈','🤣','💡','🎤','✌️','🃏'];
-    const bg=document.getElementById('doodles');
-    for(let i=0;i<14;i++){
-      const el=document.createElement('span');
-      el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
-      el.style.left=(Math.random()*100)+'%';
-      el.style.animationDuration=(20+Math.random()*20)+'s';
-      el.style.animationDelay=-(Math.random()*30)+'s';
-      el.style.fontSize=(24+Math.random()*20)+'px';
-      bg.appendChild(el);
-    }
-  })();
-  window.addEventListener('message', (e) => {
-    if (e.data && e.data.spitwitTV) render(e.data);
-  });
-  let timerInterval = null;
-  function render(data) {
-    const tv = document.getElementById('tv');
-    const { phase } = data;
-    if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
-    if (phase === 'lobby') {
-      tv.innerHTML = \`
-        <div class="logo">SPITWIT</div>
-        <div class="phase">Waiting for players</div>
-        <div style="color:var(--muted);font-size:16px;font-weight:800;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;">Room Code</div>
-        <div class="room-code">\${data.roomCode}</div>
-        <div style="color:var(--muted);font-size:16px;font-weight:700;letter-spacing:1px;margin-bottom:20px;">\${data.players.length} player\${data.players.length!==1?'s':''} joined</div>
-        <div class="chips">\${data.players.map(p=>\`<div class="chip">\${p.name}</div>\`).join('')}</div>
-      \`;
-    } else if (phase === 'answering') {
-      let t = data.timerTotal || 60;
-      tv.innerHTML = \`
-        <div class="logo" style="font-size:40px;">SPITWIT</div>
-        <div class="phase">Round \${data.round} · Answer Time</div>
-        <div class="prompt-box">\${data.prompt}</div>
-        <div class="timer" id="tv-timer">\${t}</div>
-        <div style="color:var(--muted);font-size:15px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;">Who's answered?</div>
-        <div class="chips" id="tv-chips">\${data.players.map(p=>\`<div class="chip" id="tv-chip-\${p.id}">\${p.name}</div>\`).join('')}</div>
-      \`;
-      timerInterval = setInterval(() => {
-        t--; const el = document.getElementById('tv-timer');
-        if (el) { el.textContent = Math.max(0, t); if(t<=10) el.style.color='var(--accent)'; }
-        if (t <= 0) clearInterval(timerInterval);
-      }, 1000);
-    } else if (phase === 'chip-update') {
-      const chip = document.getElementById('tv-chip-' + data.playerId);
-      if (chip) chip.classList.add('done');
-    } else if (phase === 'voting') {
-      let t = data.timerTotal || 30;
-      tv.innerHTML = \`
-        <div class="logo" style="font-size:40px;">SPITWIT</div>
-        <div class="phase">Vote Now!</div>
-        \${data.isBlind ? '<div class="blind-badge">🕵️ Blind Voting</div>' : ''}
-        <div class="prompt-box" style="margin-bottom:16px;">\${data.prompt}</div>
-        <div class="timer" id="tv-timer">\${t}</div>
-        <div class="answers">\${data.answers.map(a => \`
-          <div class="answer-card">
-            <div>\${a.answer}</div>
-            \${!data.isBlind ? \`<div class="pname">\${data.players.find(p=>p.id===a.playerId)?.name||''}</div>\` : ''}
-          </div>
-        \`).join('')}</div>
-      \`;
-      timerInterval = setInterval(() => {
-        t--; const el = document.getElementById('tv-timer');
-        if (el) { el.textContent = Math.max(0, t); if(t<=10) el.style.color='var(--accent)'; }
-        if (t <= 0) clearInterval(timerInterval);
-      }, 1000);
-    } else if (phase === 'results') {
-      tv.innerHTML = \`
-        <div class="logo" style="font-size:40px;">SPITWIT</div>
-        <div class="phase">Results</div>
-        <div class="prompt-box" style="margin-bottom:16px;">\${data.prompt}</div>
-        <div class="answers">\${data.answers.map(a => {
-          const vc = data.votes[a.playerId] || 0;
-          const isW = vc === data.maxVotes && vc > 0;
-          const pname = data.players.find(p=>p.id===a.playerId)?.name || '';
-          return \`<div class="answer-card \${isW?'winner':'revealed'}">
-            <div>\${a.answer}</div>
-            <div class="pname">\${pname}</div>
-            <div class="vcount">\${vc}</div>
-            <div style="font-size:14px;color:var(--muted);font-weight:800;">\${vc===1?'vote':'votes'}</div>
-          </div>\`;
-        }).join('')}</div>
-      \`;
-    } else if (phase === 'scoreboard') {
-      const ranks = ['gold','silver','bronze'];
-      tv.innerHTML = \`
-        <div class="logo" style="font-size:48px;">SPITWIT</div>
-        <div class="phase">Leaderboard · After Round \${data.round}</div>
-        <ul class="score-list">\${data.players.map((p,i)=>\`
-          <li class="score-item">
-            <div class="score-rank \${ranks[i]||''}">\${i+1}</div>
-            <div style="flex:1;font-weight:800;font-size:22px;">\${p.name}</div>
-            <div class="score-pts">\${p.score}</div>
-          </li>
-        \`).join('')}</ul>
-      \`;
-    } else if (phase === 'winner') {
-      const w = data.players[0];
-      const ranks = ['gold','silver','bronze'];
-      tv.innerHTML = \`
-        <div class="logo">SPITWIT</div>
-        <div style="font-size:52px;margin:10px 0;animation:wpop 0.5s cubic-bezier(0.34,1.56,0.64,1);">🎉🏆🎉</div>
-        <div class="winner-banner">🏆 \${w.name} Wins!</div>
-        <div style="color:var(--muted);font-size:24px;font-weight:700;margin:8px 0 28px;">\${w.score} points</div>
-        <ul class="score-list">\${data.players.map((p,i)=>\`
-          <li class="score-item">
-            <div class="score-rank \${ranks[i]||''}">\${i+1}</div>
-            <div style="flex:1;font-weight:800;font-size:22px;">\${p.name}</div>
-            <div class="score-pts">\${p.score}</div>
-          </li>
-        \`).join('')}</ul>
-      \`;
-    }
-  }
-<\/script>
-</body>
-</html>`);
-  tvWindow.document.close();
-  notify('📺 TV Display opened!');
-}
-
-function tvUpdate(phase, data) {
-  if (!tvWindow || tvWindow.closed) return;
-  tvWindow.postMessage({ spitwitTV: true, phase, ...data }, '*');
-}
-
-function tvUpdateTimer(type, t, total) {
-  // No-op — timers are managed inside the TV window itself
-}
-
-// Also push answer chip updates to TV when answers come in
-const __tvOrigCheckAllAnswered = checkAllAnswered;
-// We'll patch answer tracking to update TV chips
-function trackAnswerForTV(playerId) {
-  tvUpdate('chip-update', { playerId });
-}
-
-// =====================================================
-//  TEXT-TO-SPEECH — READ ANSWERS ALOUD
-// =====================================================
-// =====================================================
-//  VOICE PICKER
-// =====================================================
-function populateVoicePicker() {
-  const sel = document.getElementById('tts-voice-select');
-  if (!sel) return;
-  const voices = window.speechSynthesis.getVoices();
-  const en = voices.filter(v => v.lang.startsWith('en'));
-  sel.innerHTML = '<option value="">🎲 Auto-pick best voice</option>' +
-    en.map(v => `<option value="${v.name}">${v.name} (${v.lang})</option>`).join('');
-}
-if ('speechSynthesis' in window) {
-  window.speechSynthesis.onvoiceschanged = populateVoicePicker;
-  populateVoicePicker();
-}
-
-function getSelectedVoice() {
-  const sel = document.getElementById('tts-voice-select');
-  const chosen = sel?.value;
-  const voices = window.speechSynthesis.getVoices();
-  if (chosen) return voices.find(v => v.name === chosen) || null;
-  // Auto: prefer fun/expressive voices, avoid Zira/David (robotic), prefer US English
-  const preferred = ['Samantha','Karen','Moira','Fiona','Victoria','Allison','Ava','Susan','Alex'];
-  for (const name of preferred) {
-    const v = voices.find(v => v.name.includes(name) && v.lang.startsWith('en'));
-    if (v) return v;
-  }
-  return voices.find(v => v.lang === 'en-US' && v.localService) ||
-         voices.find(v => v.lang.startsWith('en') && v.localService) ||
-         voices.find(v => v.lang.startsWith('en')) || voices[0] || null;
-}
-
-function readAnswersAloud(prompt, answers) {
-  if (!('speechSynthesis' in window)) return;
-  window.speechSynthesis.cancel();
-
-  const ttsBar = document.getElementById('tts-indicator');
-  const ttsText = document.getElementById('tts-reading-text');
-  ttsBar.style.display = 'block';
-
-  const speakSequence = (items, idx) => {
-    if (idx >= items.length) {
-      ttsBar.style.display = 'none';
-      return;
-    }
-    const { text, label, rate, pitch } = items[idx];
-    const utt = new SpeechSynthesisUtterance(text);
-    utt.rate = rate ?? 1.25;
-    utt.pitch = pitch ?? 1.1;
-    const v = getSelectedVoice();
-    if (v) utt.voice = v;
-    if (ttsText) ttsText.textContent = label;
-    utt.onend = () => setTimeout(() => speakSequence(items, idx + 1), 250);
-    utt.onerror = () => speakSequence(items, idx + 1);
-    window.speechSynthesis.speak(utt);
-  };
-
-  // Prompt read slightly slower/more dramatic, answers faster and punchy
-  const items = [
-    { text: prompt, label: '🎤 Reading prompt...', rate: 1.1, pitch: 1.2 },
-    ...answers.map((a, i) => ({
-      text: a.answer,
-      label: `🎤 Answer ${i + 1} of ${answers.length}`,
-      rate: 1.3,
-      pitch: 1.0 + (i % 3) * 0.15  // slight pitch variation per answer
-    }))
-  ];
-
-  setTimeout(() => {
-    if (window.speechSynthesis.getVoices().length === 0) {
-      window.speechSynthesis.onvoiceschanged = () => { populateVoicePicker(); speakSequence(items, 0); };
-    } else {
-      speakSequence(items, 0);
-    }
-  }, 500);
-}
-
-
-const SFX = (() => {
-  let ctx = null;
-  let muted = false;
-  let tickInterval = null;
-
-  function getCtx() {
-    if (!ctx) ctx = new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') ctx.resume();
-    return ctx;
-  }
-
-  function tone(freq, type, startTime, duration, gainVal, endFreq) {
-    if (muted) return;
-    try {
-      const c = getCtx();
-      const osc = c.createOscillator();
-      const gain = c.createGain();
-      osc.connect(gain);
-      gain.connect(c.destination);
-      osc.type = type || 'sine';
-      osc.frequency.setValueAtTime(freq, startTime);
-      if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, startTime + duration);
-      gain.gain.setValueAtTime(gainVal || 0.3, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-      osc.start(startTime);
-      osc.stop(startTime + duration);
-    } catch(e) {}
-  }
-
-  function noise(startTime, duration, gainVal) {
-    if (muted) return;
-    try {
-      const c = getCtx();
-      const bufSize = c.sampleRate * duration;
-      const buf = c.createBuffer(1, bufSize, c.sampleRate);
-      const data = buf.getChannelData(0);
-      for (let i = 0; i < bufSize; i++) data[i] = Math.random() * 2 - 1;
-      const src = c.createBufferSource();
-      src.buffer = buf;
-      const gain = c.createGain();
-      src.connect(gain);
-      gain.connect(c.destination);
-      gain.gain.setValueAtTime(gainVal || 0.1, startTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-      src.start(startTime);
-      src.stop(startTime + duration);
-    } catch(e) {}
-  }
-
-  return {
-    isMuted: () => muted,
-    toggleMute: () => { muted = !muted; return muted; },
-
-    // 🎵 Upbeat game start jingle
-    gameStart() {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      const melody = [523, 659, 784, 1047];
-      melody.forEach((f, i) => tone(f, 'square', now + i * 0.12, 0.18, 0.15));
-      tone(1047, 'square', now + 0.48, 0.35, 0.2);
-    },
-
-    // 🥁 Drumroll for reveal (builds up)
-    drumroll(duration = 2.5) {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      let t = 0;
-      let interval = 0.25;
-      while (t < duration) {
-        noise(now + t, 0.06, 0.12);
-        tone(80, 'sine', now + t, 0.06, 0.15);
-        interval = Math.max(0.04, interval * 0.93);
-        t += interval;
-      }
-    },
-
-    // ✅ Answer submitted — satisfying "ding"
-    answerSubmit() {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      tone(880, 'sine', now, 0.1, 0.25);
-      tone(1320, 'sine', now + 0.08, 0.18, 0.2);
-    },
-
-    // 🗳️ Vote selected — subtle click
-    voteSelect() {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      tone(440, 'triangle', now, 0.06, 0.2);
-      tone(660, 'triangle', now + 0.05, 0.08, 0.15);
-    },
-
-    // ✅ Vote submitted
-    voteSubmit() {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      tone(660, 'sine', now, 0.08, 0.2);
-      tone(880, 'sine', now + 0.07, 0.08, 0.2);
-      tone(1100, 'sine', now + 0.14, 0.15, 0.2);
-    },
-
-    // 🏆 Winner revealed — triumphant fanfare
-    winnerFanfare() {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      // Chord stabs
-      [523, 659, 784].forEach(f => tone(f, 'square', now, 0.15, 0.12));
-      [523, 659, 784].forEach(f => tone(f, 'square', now + 0.2, 0.15, 0.12));
-      [659, 784, 988].forEach(f => tone(f, 'square', now + 0.4, 0.2, 0.14));
-      [784, 988, 1175].forEach(f => tone(f, 'square', now + 0.65, 0.5, 0.16));
-      // Rising sweep
-      tone(200, 'sawtooth', now + 0.6, 0.6, 0.08, 1200);
-      // Bass hit
-      tone(65, 'sine', now, 0.4, 0.25);
-      tone(65, 'sine', now + 0.2, 0.3, 0.2);
-    },
-
-    // 📊 Scoreboard whoosh
-    scoreboard() {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      tone(300, 'sawtooth', now, 0.4, 0.1, 150);
-      tone(800, 'sine', now + 0.1, 0.2, 0.12);
-      tone(1000, 'sine', now + 0.25, 0.3, 0.15);
-    },
-
-    // ⏱️ Last 5 seconds — urgent ticking
-    startTick(seconds, timerId) {
-      if (muted) return;
-      this.stopTick();
-      tickInterval = setInterval(() => {
-        const c = getCtx();
-        const now = c.currentTime;
-        tone(1200, 'square', now, 0.05, 0.18);
-        noise(now, 0.03, 0.05);
-      }, 500);
-    },
-
-    stopTick() {
-      if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
-    },
-
-    // 💥 Time's up buzzer
-    timesUp() {
-      if (muted) return;
-      this.stopTick();
-      const c = getCtx();
-      const now = c.currentTime;
-      tone(200, 'sawtooth', now, 0.15, 0.3, 100);
-      tone(150, 'sawtooth', now + 0.18, 0.15, 0.3, 80);
-      tone(120, 'sawtooth', now + 0.36, 0.3, 0.3, 60);
-      noise(now, 0.1, 0.15);
-    },
-
-    // 👋 Player joined
-    playerJoined() {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      tone(523, 'sine', now, 0.08, 0.2);
-      tone(784, 'sine', now + 0.1, 0.12, 0.2);
-    },
-
-    // 🎉 Round winner reveal
-    roundWin() {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      tone(523, 'triangle', now, 0.1, 0.2);
-      tone(659, 'triangle', now + 0.1, 0.1, 0.2);
-      tone(784, 'triangle', now + 0.2, 0.2, 0.25);
-    },
-
-    // 😅 No votes — sad trombone
-    sadTrombone() {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      tone(350, 'sawtooth', now, 0.2, 0.2, 280);
-      tone(280, 'sawtooth', now + 0.22, 0.2, 0.2, 220);
-      tone(220, 'sawtooth', now + 0.44, 0.35, 0.2, 180);
-    },
-
-    // 🔔 New prompt revealed
-    promptReveal() {
-      if (muted) return;
-      const c = getCtx();
-      const now = c.currentTime;
-      tone(440, 'sine', now, 0.05, 0.15);
-      tone(554, 'sine', now + 0.06, 0.05, 0.12);
-      tone(659, 'sine', now + 0.12, 0.15, 0.18);
-    },
-  };
-})();
-
-function toggleMute() {
-  const muted = SFX.toggleMute();
-  document.getElementById('mute-btn').textContent = muted ? '🔇' : '🔊';
-  if (muted) SFX.stopTick();
-}
-
-// =====================================================
-//  WIRE SOUNDS INTO GAME EVENTS
-// =====================================================
-
-// Patch: player joined in lobby
-const _origHandleClientMsg = handleClientMessage;
-// Override renderLobbyPlayers to play join sound
-const _origRenderLobby = renderLobbyPlayers;
-// We patch at the source instead — handleClientMessage already calls renderLobbyPlayers
-// Intercept via overriding the join handling directly:
-const __origHandleClientMessage = handleClientMessage;
-window.handleClientMessage = function(conn, data) {
-  __origHandleClientMessage(conn, data);
-  if (data.type === 'join') SFX.playerJoined();
-};
-
-// Patch: startAnsweringPhase — add prompt reveal sound + urgent tick
-const __origStartAnswering = startAnsweringPhase;
-window.startAnsweringPhase = function(prompt, round, promptIdx, totalPrompts) {
-  __origStartAnswering(prompt, round, promptIdx, totalPrompts);
-  SFX.promptReveal();
-  // Schedule urgent ticking for last 5 seconds
-  const total = state.gameSettings?.answerTime || 60;
-  SFX.stopTick();
-  if (total > 5) {
-    setTimeout(() => { if (!state.answerSubmitted) SFX.startTick(); }, (total - 5) * 1000);
-  }
-};
-
-// Patch: startVotingPhase
-const __origStartVoting = startVotingPhase;
-window.startVotingPhase = function(prompt, answers, round, promptIdx, totalPrompts) {
-  __origStartVoting(prompt, answers, round, promptIdx, totalPrompts);
-  SFX.stopTick();
-  SFX.promptReveal();
-  const total = state.gameSettings?.voteTime || 30;
-  if (total > 5) {
-    setTimeout(() => { if (!state.voteSubmitted) SFX.startTick(); }, (total - 5) * 1000);
-  }
-};
-
-// Patch: submitAnswer
-const __origSubmitAnswer = submitAnswer;
-window.submitAnswer = function() {
-  const answer = document.getElementById('answer-input').value.trim();
-  if (!answer) return __origSubmitAnswer();
-  SFX.stopTick();
-  SFX.answerSubmit();
-  __origSubmitAnswer();
-};
-
-// Patch: selectVote
-const __origSelectVote = selectVote;
-window.selectVote = function(playerId) {
-  __origSelectVote(playerId);
-  SFX.voteSelect();
-};
-
-// Patch: submitVote
-const __origSubmitVote = submitVote;
-window.submitVote = function() {
-  if (!state.myVote) return __origSubmitVote();
-  SFX.stopTick();
-  SFX.voteSubmit();
-  __origSubmitVote();
-};
-
-// Patch: showResultsPhase — drumroll then reveal
-const __origShowResults = showResultsPhase;
-window.showResultsPhase = function(prompt, answers, votes, scores) {
-  SFX.stopTick();
-  SFX.drumroll(1.8);
-  setTimeout(() => {
-    __origShowResults(prompt, answers, votes, scores);
-    // Check if there's a winner or if it's all zeros
-    const voteCounts = {};
-    Object.values(votes).forEach(v => { voteCounts[v] = (voteCounts[v] || 0) + 1; });
-    const maxVotes = Math.max(...Object.values(voteCounts), 0);
-    if (maxVotes > 0) SFX.roundWin();
-    else SFX.sadTrombone();
-  }, 1900);
-};
-
-// Patch: showScoreboardPhase
-const __origShowScoreboard = showScoreboardPhase;
-window.showScoreboardPhase = function(players, isHost) {
-  SFX.scoreboard();
-  __origShowScoreboard(players, isHost);
-};
-
-// Patch: showWinnerPhase
-const __origShowWinner = showWinnerPhase;
-window.showWinnerPhase = function(players) {
-  SFX.winnerFanfare();
-  __origShowWinner(players);
-};
-
-// Patch: hostStartGame
-const __origHostStartGame = hostStartGame;
-window.hostStartGame = function() {
-  SFX.gameStart();
-  __origHostStartGame();
-};
-
-// Patch: hostTallyVotes — times up sound when timer runs out
-const __origHostTallyVotes = hostTallyVotes;
-window.hostTallyVotes = function() {
-  SFX.stopTick();
-  __origHostTallyVotes();
-};
-</script>
-
+<script type="module" src="js/main.js"></script>
 </body>
 </html>
