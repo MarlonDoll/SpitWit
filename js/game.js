@@ -304,6 +304,7 @@ export function submitVote() {
 }
 
 export function leaveGame() {
+  if (state.visualTimer) { clearInterval(state.visualTimer); state.visualTimer = null; }
   clearTimer();
   SFX.stopTick();
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
@@ -316,7 +317,7 @@ export function leaveGame() {
     isHost: false, peer: null, connections: [], players: [], myId: null,
     myName: '', hostConn: null, gameSettings: {}, currentRound: 0,
     totalRounds: 5, prompts: [], currentPromptIdx: 0, answers: {}, votes: {},
-    timerInterval: null, phase: 'lobby', customPrompts: savedCustomPrompts,
+    timerInterval: null, visualTimer: null, phase: 'lobby', customPrompts: savedCustomPrompts,
     myVote: null, myAnswer: '', answerSubmitted: false, voteSubmitted: false,
     recap: [], phaseStartTime: 0, pendingMessages: {},
   });

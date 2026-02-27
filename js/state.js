@@ -18,6 +18,7 @@ export const state = {
   answers: {},        // {playerId: answer}
   votes: {},          // {voterId: answererPlayerId}
   timerInterval: null,
+  visualTimer: null,    // visual countdown interval (separate from game-logic timer)
   phase: 'lobby',     // lobby | answering | voting | results | scoreboard | winner
   customPrompts: [],
   myVote: null,

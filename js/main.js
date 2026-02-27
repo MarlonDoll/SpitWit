@@ -110,6 +110,19 @@ function importPromptsFromFile(fileInput) {
 }
 
 // =====================================================
+//  QUICK JOIN FROM HOME SCREEN
+// =====================================================
+function quickJoinFromHome() {
+  const code = document.getElementById('quick-join-code').value.trim().toUpperCase();
+  const joinCodeEl = document.getElementById('join-code');
+  if (joinCodeEl && code) joinCodeEl.value = code;
+  showScreen('screen-join');
+  const joinName = document.getElementById('join-name');
+  if (joinName && !joinName.value) joinName.focus();
+  else if (joinCodeEl && !code) joinCodeEl.focus();
+}
+
+// =====================================================
 //  DOODLE BACKGROUND
 // =====================================================
 function initDoodles() {
@@ -151,6 +164,7 @@ function exposeGlobals() {
   window.toggleMute = toggleMute;
   window.openHostDisplay = openHostDisplay;
   window.notify = notify;
+  window.quickJoinFromHome = quickJoinFromHome;
 }
 
 // =====================================================
@@ -164,6 +178,13 @@ document.addEventListener('DOMContentLoaded', () => {
   initTimeEstimate();
   initDoodles();
   exposeGlobals();
+
+  // Quick-join code: auto-uppercase + Enter to submit
+  const quickJoinInput = document.getElementById('quick-join-code');
+  if (quickJoinInput) {
+    quickJoinInput.addEventListener('input', () => { quickJoinInput.value = quickJoinInput.value.toUpperCase(); });
+    quickJoinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') quickJoinFromHome(); });
+  }
 
   // Auto-uppercase join code
   const codeInput = document.getElementById('join-code');

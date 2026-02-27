@@ -103,7 +103,8 @@ export function startAnsweringPhase(prompt, round, promptIdx, totalPrompts) {
   document.getElementById('answer-timer').textContent = t;
   document.getElementById('answer-timer-bar').style.width = '100%';
 
-  // Visual countdown (both host and client)
+  // Visual countdown (both host and client) — clear any stale timer from a previous phase
+  if (state.visualTimer) { clearInterval(state.visualTimer); state.visualTimer = null; }
   document.getElementById('answer-timer').classList.remove('urgent');
   document.getElementById('answer-timer-bar').classList.remove('urgent');
   const ti = setInterval(() => {
@@ -113,8 +114,9 @@ export function startAnsweringPhase(prompt, round, promptIdx, totalPrompts) {
     timerEl.textContent = Math.max(0, t);
     barEl.style.width = (Math.max(0, t) / total * 100) + '%';
     if (t <= 10) { timerEl.classList.add('urgent'); barEl.classList.add('urgent'); }
-    if (t <= 0) clearInterval(ti);
+    if (t <= 0) { clearInterval(ti); state.visualTimer = null; }
   }, 1000);
+  state.visualTimer = ti;
 
   // Urgent tick for last 5 seconds
   SFX.stopTick();
@@ -182,6 +184,8 @@ export function startVotingPhase(prompt, answers, round, promptIdx, totalPrompts
   document.getElementById('vote-timer-bar').style.width = '100%';
   document.getElementById('vote-timer').classList.remove('urgent');
   document.getElementById('vote-timer-bar').classList.remove('urgent');
+  // Clear any stale visual timer from the answer phase
+  if (state.visualTimer) { clearInterval(state.visualTimer); state.visualTimer = null; }
   const ti = setInterval(() => {
     t--;
     const timerEl = document.getElementById('vote-timer');
@@ -189,9 +193,11 @@ export function startVotingPhase(prompt, answers, round, promptIdx, totalPrompts
     timerEl.textContent = Math.max(0, t);
     barEl.style.width = (Math.max(0, t) / total * 100) + '%';
     if (t <= 10) { timerEl.classList.add('urgent'); barEl.classList.add('urgent'); }
-    if (t <= 0) clearInterval(ti);
+    if (t <= 0) { clearInterval(ti); state.visualTimer = null; }
   }, 1000);
-  state.timerInterval = ti;
+  state.visualTimer = ti;
+  // Note: do NOT set state.timerInterval here — host's clearTimer() in hostStartVoting
+  // needs to clear the previous answer game-logic timer, not this visual timer.
 
   if (total > 5) {
     setTimeout(() => { if (!state.voteSubmitted) SFX.startTick(); }, (total - 5) * 1000);
