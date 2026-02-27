@@ -12,6 +12,53 @@ import { hostStartGame, hostNextRound, hostContinue, submitAnswer,
 import { showRecap } from './ui.js';
 
 // =====================================================
+//  NAME MEMORY
+// =====================================================
+const NAME_KEY = 'spitwit-player-name';
+
+function loadSavedName() {
+  const saved = localStorage.getItem(NAME_KEY);
+  if (!saved) return;
+  const hostInput = document.getElementById('host-name');
+  const joinInput = document.getElementById('join-name');
+  if (hostInput && !hostInput.value) hostInput.value = saved;
+  if (joinInput && !joinInput.value) joinInput.value = saved;
+}
+
+function initNamePersistence() {
+  ['host-name', 'join-name'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      if (el.value.trim()) localStorage.setItem(NAME_KEY, el.value.trim());
+    });
+  });
+}
+
+// =====================================================
+//  LIVE TIME ESTIMATE
+// =====================================================
+function updateTimeEstimate() {
+  const rounds = parseInt(document.getElementById('num-rounds')?.value || 5);
+  const answerTime = parseInt(document.getElementById('answer-time')?.value || 60);
+  const voteTime = parseInt(document.getElementById('vote-time')?.value || 20);
+  // Range: fast (60% of timers used + 20s overhead) to slow (full timers + 35s overhead)
+  const perRoundFast = answerTime * 0.6 + voteTime * 0.6 + 20;
+  const perRoundSlow = answerTime + voteTime + 35;
+  const minLow = Math.round((rounds * perRoundFast) / 60);
+  const minHigh = Math.round((rounds * perRoundSlow) / 60);
+  const el = document.getElementById('time-estimate');
+  if (el) el.textContent = `⏱ ~${minLow}–${minHigh} min · depends on player count & how fast everyone answers`;
+}
+
+function initTimeEstimate() {
+  ['num-rounds', 'answer-time', 'vote-time'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', updateTimeEstimate);
+  });
+  updateTimeEstimate();
+}
+
+// =====================================================
 //  CUSTOM PROMPTS
 // =====================================================
 function loadCustomPrompts() {
@@ -112,6 +159,9 @@ function exposeGlobals() {
 document.addEventListener('DOMContentLoaded', () => {
   loadCustomPrompts();
   renderCustomPrompts();
+  loadSavedName();
+  initNamePersistence();
+  initTimeEstimate();
   initDoodles();
   exposeGlobals();
 
