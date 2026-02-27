@@ -179,7 +179,12 @@ export function toggleMute() {
   const muted = SFX.toggleMute();
   const btn = document.getElementById('mute-btn');
   if (btn) btn.textContent = muted ? '🔇' : '🔊';
-  if (muted) SFX.stopTick();
+  if (muted) {
+    SFX.stopTick();
+    if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    const ttsBar = document.getElementById('tts-indicator');
+    if (ttsBar) ttsBar.style.display = 'none';
+  }
 }
 
 // ===== TEXT-TO-SPEECH =====
@@ -209,6 +214,7 @@ export function getSelectedVoice() {
 
 export function readAnswersAloud(prompt, answers) {
   if (!('speechSynthesis' in window)) return;
+  if (SFX.isMuted()) return;
   window.speechSynthesis.cancel();
 
   const ttsBar = document.getElementById('tts-indicator');
