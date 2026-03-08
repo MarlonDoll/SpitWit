@@ -137,6 +137,12 @@ export function hostStartVoting() {
     .filter(p => state.answers[p.id] && state.answers[p.id] !== '(disconnected)')
     .map(p => ({ playerId: p.id, answer: state.answers[p.id] }));
 
+  // Shuffle so vote order isn't biased by join order
+  for (let i = answersArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [answersArr[i], answersArr[j]] = [answersArr[j], answersArr[i]];
+  }
+
   // If everyone disconnected somehow, fall through to tally
   if (answersArr.length < 2) {
     hostTallyVotes();
