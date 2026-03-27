@@ -113,7 +113,7 @@ function importPromptsFromFile(fileInput) {
 //  QUICK JOIN FROM HOME SCREEN
 // =====================================================
 function quickJoinFromHome() {
-  const code = document.getElementById('quick-join-code').value.trim().toUpperCase();
+  const code = document.getElementById('quick-join-code').value.trim().toUpperCase().replace(/0/g, 'O');
   const joinCodeEl = document.getElementById('join-code');
   if (joinCodeEl && code) joinCodeEl.value = code;
   showScreen('screen-join');
@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Quick-join code: auto-uppercase + Enter to submit
   const quickJoinInput = document.getElementById('quick-join-code');
   if (quickJoinInput) {
-    quickJoinInput.addEventListener('input', () => { quickJoinInput.value = quickJoinInput.value.toUpperCase(); });
+    quickJoinInput.addEventListener('input', () => { quickJoinInput.value = quickJoinInput.value.toUpperCase().replace(/0/g, 'O'); });
     quickJoinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') quickJoinFromHome(); });
   }
 
@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const codeInput = document.getElementById('join-code');
   if (codeInput) {
     codeInput.addEventListener('input', () => {
-      codeInput.value = codeInput.value.toUpperCase();
+      codeInput.value = codeInput.value.toUpperCase().replace(/0/g, 'O');
     });
   }
 

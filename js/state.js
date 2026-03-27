@@ -55,7 +55,8 @@ export function notify(msg, duration = 2500) {
 }
 
 export function generateRoomCode() {
-  return Math.random().toString(36).substring(2, 6).toUpperCase();
+  // Replace '0' with 'O' to avoid confusion when reading room codes aloud
+  return Math.random().toString(36).substring(2, 6).toUpperCase().replace(/0/g, 'O');
 }
 
 export function generateMsgId() {
