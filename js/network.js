@@ -149,23 +149,27 @@ export function handleClientMessage(conn, data) {
   }
 
   if (data.type === 'join') {
-    // Check for reconnection
-    const existingPlayer = state.players.find(
-      p => p.name === data.name && p.disconnected && state.phase !== 'lobby'
-    );
-
-    if (existingPlayer) {
-      existingPlayer.id = conn.peer;
-      existingPlayer.disconnected = false;
-      notify(`${data.name} reconnected! 🔄`);
-      broadcastToAll({ type: 'player-list', players: state.players });
-      renderLobbyPlayers();
-      sendReconnectState(conn, existingPlayer);
+    // Mid-game: reconnect by name (works even if disconnect flag was never set due to silent disconnect)
+    if (state.phase !== 'lobby') {
+      const existingPlayer = state.players.find(p => p.name === data.name);
+      if (existingPlayer) {
+        existingPlayer.id = conn.peer;
+        existingPlayer.disconnected = false;
+        notify(`${data.name} reconnected! 🔄`);
+        broadcastToAll({ type: 'player-list', players: state.players });
+        renderLobbyPlayers();
+        sendReconnectState(conn, existingPlayer);
+      } else {
+        try { conn.send({ type: 'error', message: 'Game already in progress — cannot join mid-game.' }); } catch(e) {}
+      }
       return;
     }
 
-    if (state.phase !== 'lobby') {
-      try { conn.send({ type: 'error', message: 'Game already in progress — cannot join mid-game.' }); } catch(e) {}
+    // Lobby: if same name already exists, update their connection (browser refresh / duplicate tab)
+    const duplicate = state.players.find(p => p.name === data.name);
+    if (duplicate) {
+      duplicate.id = conn.peer;
+      conn.send({ type: 'player-list', players: state.players });
       return;
     }
 
@@ -190,7 +194,7 @@ export function handleClientMessage(conn, data) {
 }
 
 function sendReconnectState(conn, player) {
-  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
+  const promptsPerRound = 1;
   const elapsed = (Date.now() - state.phaseStartTime) / 1000;
   const base = {
     type: 'reconnect',
@@ -221,7 +225,7 @@ function sendReconnectState(conn, player) {
 // ===== JOIN GAME =====
 export function joinGame() {
   const name = document.getElementById('join-name').value.trim();
-  const code = document.getElementById('join-code').value.trim().toUpperCase();
+  const code = document.getElementById('join-code').value.trim().toUpperCase().replace(/0/g, 'O');
   if (!name) { alert('Enter your name!'); return; }
   if (!code) { alert('Enter a room code!'); return; }
 

@@ -17,7 +17,7 @@ export function hostStartGame() {
   SFX.gameStart();
 
   const settings = state.gameSettings;
-  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
+  const promptsPerRound = 1;
   const totalPromptsNeeded = settings.rounds * promptsPerRound;
 
   let pool;
@@ -67,7 +67,7 @@ export function hostNextPrompt() {
   state.answerSubmitted = false;
   state.voteSubmitted = false;
 
-  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
+  const promptsPerRound = 1;
 
   if (state.currentPromptIdx >= state.prompts.length) {
     hostShowFinalWinner();
@@ -99,20 +99,23 @@ export function hostNextPrompt() {
     if (t <= 0) {
       clearTimer();
       SFX.timesUp();
-      // Fill any unanswered players
-      state.players.forEach(p => {
-        if (!p.disconnected && state.answers[p.id] === undefined) {
-          if (p.id === state.myId) {
-            const partial = document.getElementById('answer-input')?.value.trim();
-            state.answers[p.id] = partial || '(no answer)';
-          } else {
-            state.answers[p.id] = '(no answer)';
+      // Short grace period so in-flight answers from clients can arrive before we fill (no answer)
+      setTimeout(() => {
+        if (state.phase !== 'answering') return; // already moved to voting via checkAllAnswered
+        state.players.forEach(p => {
+          if (!p.disconnected && state.answers[p.id] === undefined) {
+            if (p.id === state.myId) {
+              const partial = document.getElementById('answer-input')?.value.trim();
+              state.answers[p.id] = partial || '(no answer)';
+            } else {
+              state.answers[p.id] = '(no answer)';
+            }
+          } else if (p.disconnected && state.answers[p.id] === undefined) {
+            state.answers[p.id] = '(disconnected)';
           }
-        } else if (p.disconnected && state.answers[p.id] === undefined) {
-          state.answers[p.id] = '(disconnected)';
-        }
-      });
-      hostStartVoting();
+        });
+        hostStartVoting();
+      }, 800);
     }
   }, 1000);
 }
@@ -130,12 +133,19 @@ export function checkAllAnswered() {
 }
 
 export function hostStartVoting() {
+  if (state.phase === 'voting') return; // guard against double-call during grace period
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   const prompt = state.prompts[state.currentPromptIdx];
   // Only show non-disconnected answers (or players with real answers)
   const answersArr = state.players
     .filter(p => state.answers[p.id] && state.answers[p.id] !== '(disconnected)')
     .map(p => ({ playerId: p.id, answer: state.answers[p.id] }));
+
+  // Shuffle so vote order isn't biased by join order
+  for (let i = answersArr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [answersArr[i], answersArr[j]] = [answersArr[j], answersArr[i]];
+  }
 
   // If everyone disconnected somehow, fall through to tally
   if (answersArr.length < 2) {
@@ -146,7 +156,7 @@ export function hostStartVoting() {
   state.phase = 'voting';
   state.phaseStartTime = Date.now();
 
-  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
+  const promptsPerRound = 1;
   broadcastToAll({ type: 'voting', prompt, answers: answersArr, round: state.currentRound,
     promptIdx: (state.currentPromptIdx % promptsPerRound) + 1, totalPrompts: promptsPerRound });
   startVotingPhase(prompt, answersArr, state.currentRound,
@@ -237,7 +247,7 @@ export function hostTallyVotes() {
 
 export function hostNextRound() {
   state.currentPromptIdx++;
-  const promptsPerRound = Math.min(3, Math.ceil(state.players.length / 2));
+  const promptsPerRound = 1;
   const newRound = Math.floor(state.currentPromptIdx / promptsPerRound) + 1;
 
   if (state.currentPromptIdx >= state.prompts.length || newRound > state.totalRounds) {

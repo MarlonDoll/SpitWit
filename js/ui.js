@@ -82,7 +82,7 @@ export function startAnsweringPhase(prompt, round, promptIdx, totalPrompts) {
   state.answerSubmitted = false;
   state.myAnswer = '';
 
-  document.getElementById('answer-round-badge').textContent = `ROUND ${round} · PROMPT ${promptIdx} OF ${totalPrompts}`;
+  document.getElementById('answer-round-badge').textContent = `ROUND ${round}`;
   document.getElementById('answer-prompt-text').textContent = prompt;
   document.getElementById('answer-for-label').textContent = 'YOUR PROMPT';
 
