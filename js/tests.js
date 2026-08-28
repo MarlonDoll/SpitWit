@@ -6,6 +6,8 @@
 import { shuffle } from './state.js';
 import { UNIQUE_PROMPTS, PROMPT_PACKS, PERSONAL_PROMPT_TEMPLATES,
          buildPersonalizedPool, interleavePersonal } from './prompts.js';
+import { generateRoomCode, normalizeRoomCode, peerIdForRoom,
+         ROOM_CODE_LENGTH, iceServers } from './net-config.js';
 
 let passed = 0;
 let failed = 0;
@@ -125,15 +127,85 @@ test('Scoring logic', () => {
 
 // ===== ROOM CODE TESTS =====
 test('generateRoomCode()', () => {
-  // Test inline (state module not imported here to avoid circular issues)
-  function generateRoomCode() {
-    return Math.random().toString(36).substring(2, 6).toUpperCase();
-  }
-  for (let i = 0; i < 10; i++) {
+  const AMBIGUOUS = /[ILOU]/;
+  let sawAmbiguous = false;
+  for (let i = 0; i < 500; i++) {
     const code = generateRoomCode();
-    assert(code.length === 4, `room code has 4 chars (got "${code}")`);
-    assert(/^[A-Z0-9]{4}$/.test(code), `room code is alphanumeric uppercase (got "${code}")`);
+    if (code.length !== ROOM_CODE_LENGTH) {
+      assert(false, `room code has ${ROOM_CODE_LENGTH} chars (got "${code}")`);
+      return;
+    }
+    if (!/^[0-9A-Z]+$/.test(code)) {
+      assert(false, `room code is alphanumeric uppercase (got "${code}")`);
+      return;
+    }
+    if (AMBIGUOUS.test(code)) sawAmbiguous = true;
   }
+  assert(true, `room code always has ${ROOM_CODE_LENGTH} uppercase alphanumeric chars`);
+  // I/1, L/1, O/0 are indistinguishable when a code is read aloud or squinted
+  // at across a room, which is how a mistyped code became a "connection error".
+  assert(!sawAmbiguous, 'room codes never contain the ambiguous I, L, O or U');
+});
+
+test('normalizeRoomCode()', () => {
+  assert(normalizeRoomCode('7k3m') === '7K3M', 'uppercases input');
+  assert(normalizeRoomCode(' 7K3M ') === '7K3M', 'strips surrounding whitespace');
+  assert(normalizeRoomCode('7K-3M') === '7K3M', 'strips punctuation');
+  assert(normalizeRoomCode('') === '', 'empty input stays empty');
+  assert(normalizeRoomCode(null) === '', 'null input is handled');
+  assert(normalizeRoomCode('7K3MXYZ') === '7K3M', 'truncates to the code length');
+
+  // The confusable characters all fold onto the one the alphabet actually uses,
+  // so a player who reads O for 0 or l for 1 still lands in the right room.
+  assert(normalizeRoomCode('1H10') === normalizeRoomCode('IHIO'), 'I folds onto 1 and O onto 0');
+  assert(normalizeRoomCode('1H10') === normalizeRoomCode('lhlo'), 'lowercase l folds onto 1');
+  assert(normalizeRoomCode('1H10') === '1H10', 'canonical form is the generated alphabet');
+
+  // Generated codes must survive a round trip untouched.
+  for (let i = 0; i < 200; i++) {
+    const code = generateRoomCode();
+    if (normalizeRoomCode(code) !== code) {
+      assert(false, `normalize is identity on generated codes (got "${normalizeRoomCode(code)}" from "${code}")`);
+      return;
+    }
+  }
+  assert(true, 'normalize is the identity on generated codes');
+});
+
+test('peerIdForRoom()', () => {
+  assert(peerIdForRoom('7K3M') === 'spitwit-7K3M', 'peer id is namespaced by room code');
+  for (let i = 0; i < 50; i++) {
+    const id = peerIdForRoom(generateRoomCode());
+    // PeerJS ids travel in URLs, so anything outside [A-Za-z0-9_-] breaks them.
+    if (!/^[A-Za-z0-9_-]+$/.test(id)) {
+      assert(false, `peer id is URL-safe (got "${id}")`);
+      return;
+    }
+  }
+  assert(true, 'peer ids are URL-safe');
+});
+
+// ===== ICE CONFIG TESTS =====
+test('iceServers()', () => {
+  const servers = iceServers();
+  const urls = servers.flatMap(s => Array.isArray(s.urls) ? s.urls : [s.urls]);
+
+  assert(servers.length > 0, 'ICE server list is not empty');
+  assert(urls.some(u => u.startsWith('stun:')), 'includes at least one STUN server');
+
+  // Without TURN, players behind a symmetric NAT (mobile data, corporate or
+  // guest Wi-Fi, VPNs) can never open a data channel and hang on "Connecting".
+  const turn = urls.filter(u => u.startsWith('turn:') || u.startsWith('turns:'));
+  assert(turn.length > 0, 'includes at least one TURN relay');
+  assert(turn.some(u => u.includes(':443')), 'includes a TURN relay on port 443 for strict firewalls');
+  assert(turn.some(u => u.includes('transport=tcp')), 'includes a TCP TURN relay for UDP-blocking networks');
+
+  const credentialed = servers.filter(s => {
+    const u = Array.isArray(s.urls) ? s.urls[0] : s.urls;
+    return u.startsWith('turn:') || u.startsWith('turns:');
+  });
+  assert(credentialed.every(s => s.username && s.credential),
+         'every TURN entry carries credentials');
 });
 
 // ===== RESULTS SUMMARY =====
@@ -163,6 +235,18 @@ export function runTests() {
     const pool = buildPersonalizedPool(players, 10);
     assert(pool.length === 10, 'correct pool size');
     assert(!pool.some(p => p.includes('[A]')), 'no unreplaced [A] placeholders');
+  });
+
+  test('room codes (quick)', () => {
+    const code = generateRoomCode();
+    assert(code.length === ROOM_CODE_LENGTH, 'generated code has the right length');
+    assert(normalizeRoomCode(code) === code, 'generated code normalizes to itself');
+  });
+
+  test('ICE config (quick)', () => {
+    const urls = iceServers().flatMap(s => Array.isArray(s.urls) ? s.urls : [s.urls]);
+    assert(urls.some(u => u.startsWith('turn:') || u.startsWith('turns:')),
+           'a TURN relay is configured');
   });
 
   console.log(`\n📊 Results: ${passed} passed, ${failed} failed`);

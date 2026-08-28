@@ -7,7 +7,7 @@ import { SFX } from './audio.js';
 import { openHostDisplay, tvUpdate, trackAnswerForTV, closeTvWindow } from './tv.js';
 import { startAnsweringPhase, startVotingPhase, showResultsPhase,
          showScoreboardPhase, showWinnerPhase, showScreen, selectVote } from './ui.js';
-import { broadcastToAll, sendToHost, sendReliable } from './network.js';
+import { broadcastToAll, sendToHost, sendReliable, bumpEpoch, stopHeartbeat } from './network.js';
 
 export function hostStartGame() {
   if (state.players.filter(p => !p.disconnected).length < 1) {
@@ -325,6 +325,13 @@ export function leaveGame() {
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   closeTvWindow();
   document.getElementById('host-display-btn').classList.remove('visible');
+
+  // Invalidate every in-flight network callback before tearing the peer down,
+  // so a retry or reconnect timer from this session can't fire into the next one.
+  bumpEpoch();
+  stopHeartbeat();
+  Object.values(state.pendingMessages).forEach(p => clearTimeout(p.timerId));
+  state.connections.forEach(c => { try { c.close(); } catch(e) {} });
   if (state.peer) { try { state.peer.destroy(); } catch(e) {} state.peer = null; }
 
   const savedCustomPrompts = state.customPrompts || [];
@@ -335,6 +342,8 @@ export function leaveGame() {
     timerInterval: null, visualTimer: null, phase: 'lobby', customPrompts: savedCustomPrompts,
     myVote: null, myAnswer: '', answerSubmitted: false, voteSubmitted: false,
     recap: [], phaseStartTime: 0, pendingMessages: {},
+    roomCode: '', heartbeatInterval: null, lastHostContact: 0,
+    lastSyncRequest: 0, reconnecting: false,
   });
   showScreen('screen-home');
 }
