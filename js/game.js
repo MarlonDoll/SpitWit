@@ -121,6 +121,13 @@ export function hostNextPrompt() {
 }
 
 export function checkAllAnswered() {
+  // A late answer can arrive after the round has already moved on — an ACK retry,
+  // or a client auto-submitting partial text as the deadline passes. Without this
+  // guard that answer completed the set, called clearTimer() and killed the *vote*
+  // timer, then no-oped in hostStartVoting's phase check: the round hung on the
+  // voting screen until every last player happened to vote.
+  if (state.phase !== 'answering') return;
+
   // Only count non-disconnected players who haven't answered yet
   const activePlayers = state.players.filter(p => !p.disconnected);
   const allAnswered = activePlayers.every(p => state.answers[p.id] !== undefined);
@@ -181,6 +188,8 @@ export function hostStartVoting() {
 }
 
 export function checkAllVoted() {
+  if (state.phase !== 'voting') return;   // same hazard: a late vote must not re-tally
+
   // All active (non-disconnected) players must have voted (null = abstain counts)
   const activePlayers = state.players.filter(p => !p.disconnected);
   const allVoted = activePlayers.every(p => p.id in state.votes);
@@ -193,6 +202,8 @@ export function checkAllVoted() {
 }
 
 export function hostTallyVotes() {
+  if (state.phase === 'results') return;  // scores are awarded here; never run it twice
+
   // Include host vote
   if (state.myVote) state.votes[state.myId] = state.myVote;
 

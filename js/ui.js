@@ -4,6 +4,7 @@
 import { state, notify } from './state.js';
 import { SFX, readAnswersAloud } from './audio.js';
 import { tvUpdate } from './tv.js';
+import { sendReliable } from './network.js';
 
 const SCREEN_PHASE = {
   'screen-home': 'phase-home', 'screen-host-setup': 'phase-home',
@@ -114,7 +115,15 @@ export function startAnsweringPhase(prompt, round, promptIdx, totalPrompts) {
     timerEl.textContent = Math.max(0, t);
     barEl.style.width = (Math.max(0, t) / total * 100) + '%';
     if (t <= 10) { timerEl.classList.add('urgent'); barEl.classList.add('urgent'); }
-    if (t <= 0) { clearInterval(ti); state.visualTimer = null; }
+    if (t <= 0) {
+      clearInterval(ti);
+      state.visualTimer = null;
+      // Send whatever is in the box rather than losing it. This fires as the
+      // countdown ends so it reaches the host inside the grace period it holds
+      // open for in-flight answers; waiting for the 'voting' broadcast was too
+      // late for the answer to make it onto the vote screen.
+      autoSubmitPartialAnswer();
+    }
   }, 1000);
   state.visualTimer = ti;
 
@@ -124,6 +133,18 @@ export function startAnsweringPhase(prompt, round, promptIdx, totalPrompts) {
     // Clients tick on their own; host tick is handled in game.js timer
     setTimeout(() => { if (!state.answerSubmitted) SFX.startTick(); }, (total - 5) * 1000);
   }
+}
+
+// Clients only: the host fills its own partial answer directly in game.js.
+function autoSubmitPartialAnswer() {
+  if (state.isHost || state.answerSubmitted) return;
+  const partial = document.getElementById('answer-input')?.value.trim();
+  if (!partial) return;
+  state.answerSubmitted = true;
+  state.myAnswer = partial;
+  document.getElementById('answer-submitted-msg').style.display = 'block';
+  document.getElementById('submit-answer-btn').style.display = 'none';
+  sendReliable({ type: 'answer', answer: partial });
 }
 
 function resetCharCounter() {

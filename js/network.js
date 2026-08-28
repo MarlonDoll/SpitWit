@@ -372,12 +372,17 @@ export function handleClientMessage(conn, data) {
   }
 
   if (data.type === 'answer') {
+    // Ignore answers that arrive after the round moved on: the voting screen was
+    // built from a snapshot of state.answers, so accepting one now would show
+    // results nobody actually voted on.
+    if (state.phase !== 'answering') return;
     state.answers[conn.peer] = data.answer;
     trackAnswerForTV(conn.peer);
     checkAllAnswered();
   }
 
   if (data.type === 'vote') {
+    if (state.phase !== 'voting') return;
     state.votes[conn.peer] = data.vote;
     checkAllVoted();
   }
@@ -735,13 +740,6 @@ export function handleHostMessage(data) {
       startAnsweringPhase(data.prompt, data.round, data.promptIdx, data.totalPrompts);
       break;
     case 'voting':
-      if (!state.answerSubmitted) {
-        const partial = document.getElementById('answer-input')?.value.trim();
-        if (partial) {
-          state.answerSubmitted = true;
-          sendReliable({ type: 'answer', answer: partial });
-        }
-      }
       startVotingPhase(data.prompt, data.answers, data.round, data.promptIdx, data.totalPrompts);
       break;
     case 'results':
