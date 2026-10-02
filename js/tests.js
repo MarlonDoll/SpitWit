@@ -3,9 +3,9 @@
 //  Run from browser console: import('./js/tests.js').then(m => m.runTests())
 //  Or open index.html and run: window.runTests()
 // =====================================================
-import { shuffle } from './state.js';
+import { shuffle, votingSeconds } from './state.js';
 import { UNIQUE_PROMPTS, PROMPT_PACKS, PERSONAL_PROMPT_TEMPLATES,
-         buildPersonalizedPool, interleavePersonal } from './prompts.js';
+         buildPersonalizedPool } from './prompts.js';
 import { generateRoomCode, normalizeRoomCode, peerIdForRoom,
          ROOM_CODE_LENGTH, iceServers } from './net-config.js';
 
@@ -94,17 +94,6 @@ test('buildPersonalizedPool()', () => {
   });
 });
 
-// ===== interleavePersonal TESTS =====
-test('interleavePersonal()', () => {
-  const regular = Array.from({ length: 30 }, (_, i) => `Regular ${i}`);
-  const personal = Array.from({ length: 15 }, (_, i) => `Personal ${i}`);
-
-  const result = interleavePersonal(regular, personal, 3, 3);
-  assert(result.length > 0, 'returns non-empty result');
-  assert(result.some(p => p.startsWith('Personal')), 'includes personal prompts');
-  assert(result.some(p => p.startsWith('Regular')), 'includes regular prompts');
-});
-
 // ===== SCORING LOGIC TEST =====
 test('Scoring logic', () => {
   // Simulate a round: 3 players, 2 votes for Alice, 0 for Bob
@@ -123,6 +112,50 @@ test('Scoring logic', () => {
   assert(players[0].score === 1000, 'Alice gets 1000 pts for 2 votes');
   assert(players[1].score === 0,    'Bob gets 0 pts for 0 votes');
   assert(players[0].prevScore === 0, 'prevScore tracked correctly');
+});
+
+// ===== VOTING TIME TESTS =====
+test('votingSeconds()', () => {
+  assert(votingSeconds(20, 4) === 20, 'small rounds keep the host\'s chosen time');
+  assert(votingSeconds(20, 6) === 20, 'six answers still fit the base time');
+  assert(votingSeconds(20, 19) > 40, `a full room gets real reading time (got ${votingSeconds(20, 19)}s)`);
+  assert(votingSeconds(20, 19) >= votingSeconds(20, 10), 'more answers never means less time');
+  assert(votingSeconds(20, 100) <= 80, 'growth is capped so a huge room cannot stall the game');
+  assert(votingSeconds(undefined, 8) > 0, 'missing base time falls back to a sane default');
+  assert(Number.isInteger(votingSeconds(20, 19)), 'returns whole seconds');
+});
+
+// ===== PERSONALIZATION TESTS =====
+test('buildPersonalizedPool() coverage', () => {
+  const players = Array.from({ length: 19 }, (_, i) => ({ name: 'Player' + i }));
+  const pool = buildPersonalizedPool(players, 3);
+  assert(pool.length === 3, 'builds exactly the number of prompts asked for');
+  assert(!pool.some(p => /\[A\]|\[B\]/.test(p)), 'no unreplaced placeholders');
+
+  // Everyone should be named once before anyone is named twice: with more
+  // players than rounds, repeats mean someone else never comes up at all.
+  const named = new Set();
+  pool.forEach(q => players.forEach(p => { if (new RegExp('\\b' + p.name + '\\b').test(q)) named.add(p.name); }));
+  assert(named.size >= 3, `3 prompts name at least 3 different people (named ${named.size})`);
+
+  // A two-player template must not pair someone with themselves.
+  const big = buildPersonalizedPool(players, 40);
+  const selfPaired = big.filter(q => {
+    const hits = players.filter(p => new RegExp('\\b' + p.name + '\\b').test(q));
+    return hits.length === 1 && (q.match(new RegExp('\\b' + hits[0].name + '\\b', 'g')) || []).length > 1
+           && !/the most .*-coded|The most \w+ thing/i.test(q);
+  });
+  assert(selfPaired.length === 0, `nobody is paired with themselves (${selfPaired.length} cases)`);
+});
+
+test('buildPersonalizedPool() with tiny groups', () => {
+  const two = buildPersonalizedPool([{ name: 'Ash' }, { name: 'Bo' }], 6);
+  assert(two.length === 6, 'two players still fill the round count');
+  assert(!two.some(p => /\[A\]|\[B\]/.test(p)), 'no unreplaced placeholders with 2 players');
+
+  const one = buildPersonalizedPool([{ name: 'Solo' }], 3);
+  assert(one.length === 3, 'a single player does not hang the generator');
+  assert(!one.some(p => /\[A\]|\[B\]/.test(p)), 'no unreplaced placeholders with 1 player');
 });
 
 // ===== ROOM CODE TESTS =====
@@ -235,6 +268,17 @@ export function runTests() {
     const pool = buildPersonalizedPool(players, 10);
     assert(pool.length === 10, 'correct pool size');
     assert(!pool.some(p => p.includes('[A]')), 'no unreplaced [A] placeholders');
+  });
+
+  test('voting time (quick)', () => {
+    assert(votingSeconds(20, 4) === 20, 'base time kept for a small round');
+    assert(votingSeconds(20, 19) > 40, 'full room gets more reading time');
+  });
+
+  test('personalization (quick)', () => {
+    const players = Array.from({ length: 8 }, (_, i) => ({ name: 'P' + i }));
+    const pool = buildPersonalizedPool(players, 3);
+    assert(pool.length === 3 && !pool.some(p => /\[A\]|\[B\]/.test(p)), 'personal prompts build cleanly');
   });
 
   test('room codes (quick)', () => {

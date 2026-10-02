@@ -61,6 +61,15 @@ export function notify(msg, duration = 2500) {
   setTimeout(() => el.remove(), duration);
 }
 
+// Voting time has to scale with how much there is to read. A 4-player round
+// shows 4 answers; a full room shows 20+, across two or three phone screens.
+// The host's chosen time is the floor, not the whole budget.
+export function votingSeconds(baseSeconds, answerCount) {
+  const base = baseSeconds || 30;
+  const extra = Math.max(0, (answerCount || 0) - 6) * 2;
+  return Math.round(Math.min(base + extra, base + 60));
+}
+
 export function generateMsgId() {
   return Math.random().toString(36).substring(2, 10);
 }

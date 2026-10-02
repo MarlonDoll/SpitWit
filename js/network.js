@@ -1,7 +1,7 @@
 // =====================================================
 //  SPITWIT — Networking (PeerJS)
 // =====================================================
-import { state, notify, generateMsgId } from './state.js';
+import { state, notify, generateMsgId, votingSeconds } from './state.js';
 import { peerOptions, CONNECT_OPTIONS, generateRoomCode, normalizeRoomCode,
          peerIdForRoom, ROOM_CODE_LENGTH, peerJsReady, PEERJS_LOAD_ERROR } from './net-config.js';
 import { SFX } from './audio.js';
@@ -430,7 +430,7 @@ function sendReconnectState(conn, player) {
         .filter(p => state.answers[p.id] && state.answers[p.id] !== '(disconnected)')
         .map(p => ({ playerId: p.id, answer: state.answers[p.id] }));
       conn.send({ ...base, prompt: state.prompts[state.currentPromptIdx], answers: answersArr,
-        timeRemaining: Math.max(5, state.gameSettings.voteTime - elapsed) });
+        timeRemaining: Math.max(5, votingSeconds(state.gameSettings.voteTime, answersArr.length) - elapsed) });
     } else {
       conn.send({ ...base });
     }

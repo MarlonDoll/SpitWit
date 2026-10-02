@@ -354,6 +354,11 @@
   }
   .answer-item:hover { border-color: var(--accent); transform: translate(-2px,-2px); box-shadow: 5px 5px 0 var(--accent); }
   .answer-item.selected { border-color: var(--accent2); background: rgba(255,211,42,0.08); box-shadow: 4px 4px 0 var(--accent2); transform: translate(-2px,-2px); }
+  /* Your own answer. The class was being applied with no rule behind it, so in a
+     long list the only cue was a 12px label — easy to miss while scrolling past
+     twenty near-identical cards, and tapping it just scolds you. */
+  .answer-item.own-answer { opacity: 0.55; border-style: dashed; cursor: not-allowed; box-shadow: none; }
+  .answer-item.own-answer:hover { border-color: var(--border-thick); transform: none; box-shadow: none; }
 
   .tabs { display: flex; gap: 4px; margin-bottom: 20px; background: var(--surface2); border-radius: var(--radius); padding: 4px; border: 2px solid var(--border-thick); }
   .tab { flex: 1; padding: 10px; text-align: center; border-radius: 10px; cursor: pointer; font-size: 14px; font-weight: 800; color: var(--muted); transition: all 0.2s; letter-spacing: 1px; text-transform: uppercase; border: none; background: none; font-family: var(--font-body); }
@@ -682,7 +687,8 @@
     <div class="card">
       <div class="card-title">PLAYERS (<span id="player-count">1</span>/32)</div>
       <div class="player-list" id="lobby-player-list"></div>
-      <div class="text-muted" style="font-size:13px;">Waiting for more players to join...</div>
+      <div class="text-muted" style="font-size:13px;" id="lobby-hint">Waiting for more players to join...</div>
+      <div class="text-muted" style="font-size:13px;margin-top:6px;" id="lobby-time-estimate"></div>
     </div>
 
     <button class="btn btn-accent" id="start-game-btn" onclick="window.hostStartGame()" style="margin-top:8px;">

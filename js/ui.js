@@ -1,7 +1,7 @@
 // =====================================================
 //  SPITWIT — UI Rendering & Screen Management
 // =====================================================
-import { state, notify } from './state.js';
+import { state, notify, votingSeconds } from './state.js';
 import { SFX, readAnswersAloud } from './audio.js';
 import { tvUpdate } from './tv.js';
 import { sendReliable } from './network.js';
@@ -58,9 +58,29 @@ export function renderLobbyPlayers() {
       ${p.name}${p.id === state.myId ? ' (you)' : ''}${p.disconnected ? ' 📡' : ''}
     </div>`
   ).join('');
-  count.textContent = state.players.filter(p => !p.disconnected).length;
+  const activeCount = state.players.filter(p => !p.disconnected).length;
+  count.textContent = activeCount;
+  renderLobbyEstimate(activeCount);
   const code = document.getElementById('room-code-display').textContent;
   tvUpdate('lobby', { players: state.players, roomCode: code });
+}
+
+// The setup screen promises the estimate "depends on player count" but cannot
+// know it yet. In the lobby the count is real, and with a big group the voting
+// time is the part that grows, so show the host what they are actually in for.
+function renderLobbyEstimate(playerCount) {
+  const el = document.getElementById('lobby-time-estimate');
+  if (!el) return;
+  const s = state.gameSettings || {};
+  const rounds = s.rounds || 5;
+  const answerTime = s.answerTime || 45;
+  const voteSecs = votingSeconds(s.voteTime, playerCount);
+  const perRoundFast = answerTime * 0.6 + voteSecs * 0.7 + 20;
+  const perRoundSlow = answerTime + voteSecs + 35;
+  const low = Math.round((rounds * perRoundFast) / 60);
+  const high = Math.round((rounds * perRoundSlow) / 60);
+  el.textContent = `⏱ ~${low}–${high} min for ${rounds} round${rounds !== 1 ? 's' : ''} · `
+    + `${playerCount} answer${playerCount !== 1 ? 's' : ''} to read per round, so voting runs ${voteSecs}s`;
 }
 
 export function renderWaitPlayers() {
@@ -185,7 +205,7 @@ export function startVotingPhase(prompt, answers, round, promptIdx, totalPrompts
     return `
       <div class="answer-item ${isOwn ? 'own-answer' : ''}"
            id="vote-opt-${a.playerId}"
-           style="animation-delay:${idx * 0.07}s"
+           style="animation-delay:${Math.min(idx * 0.07, 0.5)}s"
            onclick="${isOwn ? `window.notify("You can't vote for yourself!")` : `window.selectVote('${a.playerId}')`}">
         <span>${a.answer}</span>
         ${nameHtml}
@@ -193,13 +213,14 @@ export function startVotingPhase(prompt, answers, round, promptIdx, totalPrompts
     `;
   }).join('');
 
+  const total = votingSeconds(state.gameSettings?.voteTime, answers.length);
+
   showScreen('screen-vote');
-  tvUpdate('voting', { prompt, answers, players: state.players, isBlind, round, timerTotal: state.gameSettings?.voteTime || 30 });
+  tvUpdate('voting', { prompt, answers, players: state.players, isBlind, round, timerTotal: total });
 
   SFX.stopTick();
   SFX.promptReveal();
 
-  const total = state.gameSettings?.voteTime || 30;
   let t = total;
   document.getElementById('vote-timer').textContent = t;
   document.getElementById('vote-timer-bar').style.width = '100%';
