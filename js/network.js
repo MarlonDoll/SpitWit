@@ -519,17 +519,41 @@ function connectToHost(name, code, attempt, epoch) {
     const conn = peer.connect(peerIdForRoom(code), CONNECT_OPTIONS);
     state.hostConn = conn;
 
+    // Record which candidate types ICE actually gathers. Without this the only
+    // thing a timeout could say was "check the room code", which sent players
+    // chasing a typo when the real problem was that no relay was reachable.
+    // addEventListener coexists with the onicecandidate handler PeerJS sets.
+    const seenTypes = new Set();
+    const watchIce = setInterval(() => {
+      const pc = conn.peerConnection;
+      if (!pc || pc.__spitwitWatched) return;
+      pc.__spitwitWatched = true;
+      clearInterval(watchIce);
+      pc.addEventListener('icecandidate', (e) => {
+        const m = e.candidate && /\btyp (\w+)/.exec(e.candidate.candidate || '');
+        if (m) seenTypes.add(m[1]);
+      });
+    }, 150);
+    const stopWatchingIce = () => clearInterval(watchIce);
+
     // ICE takes a few seconds on a good network and forever on a bad one.
     const nudge = setTimeout(() => {
       if (!stale(epoch) && !conn.open && onJoinScreen) {
-        setJoinStatus('Still connecting — trying a relay...', 'waiting');
+        setJoinStatus('Still connecting — your network is taking the slow path...', 'waiting');
       }
     }, 6000);
 
     const connTimeout = setTimeout(() => {
       if (stale(epoch) || conn.open) return;
       clearTimeout(nudge);
-      giveUp('Could not connect to the host. Ask them to confirm the code, then try again.');
+      stopWatchingIce();
+      // Name the actual failure. No relay candidate on a strict network is the
+      // one that has stranded people twice now.
+      const msg = seenTypes.has('relay')
+        ? 'Could not reach the host. They may have closed the room — check the code with them.'
+        : 'Your network needs a relay to connect and none was available. '
+          + 'Tap "Can\'t connect?" on the home screen to see details.';
+      giveUp(msg);
     }, CONN_OPEN_TIMEOUT_MS);
 
     const onOpen = () => {
@@ -537,6 +561,7 @@ function connectToHost(name, code, attempt, epoch) {
       established = true;
       clearTimeout(nudge);
       clearTimeout(connTimeout);
+      stopWatchingIce();
       state.lastHostContact = Date.now();
       state.reconnecting = false;
       conn.send({ type: 'join', name });
@@ -560,13 +585,15 @@ function connectToHost(name, code, attempt, epoch) {
       if (stale(epoch) || conn.open) return;
       clearTimeout(nudge);
       clearTimeout(connTimeout);
-      giveUp('Could not connect to the host. Ask them to confirm the code, then try again.');
+      stopWatchingIce();
+      giveUp('Could not connect to the host. Check the code with them, then try again.');
     });
 
     conn.on('close', () => {
       if (stale(epoch)) return;
       clearTimeout(nudge);
       clearTimeout(connTimeout);
+      stopWatchingIce();
       if (conn !== state.hostConn) return;   // superseded by a newer connection
       handleHostLinkLost();
     });

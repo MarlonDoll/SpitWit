@@ -533,6 +533,8 @@
 
     <p class="text-center">
       <button class="how-to-play-link" onclick="var c=document.getElementById('how-to-play-card');c.style.display=c.style.display==='none'?'block':'none'">How to Play?</button>
+      <span style="color:var(--muted);margin:0 6px;">·</span>
+      <button class="how-to-play-link" onclick="window.showConnectionCheck()">Can't connect?</button>
     </p>
     <div id="how-to-play-card" class="card" style="display:none; margin-top:12px;">
       <div class="card-title">HOW TO PLAY</div>
@@ -567,9 +569,10 @@
         <label>Number of Rounds</label>
         <select id="num-rounds">
           <option value="3">3 Rounds (Quick)</option>
-          <option value="5" selected>5 Rounds (Standard)</option>
-          <option value="7">7 Rounds (Extended)</option>
-          <option value="10">10 Rounds (Marathon)</option>
+          <option value="5">5 Rounds (Short)</option>
+          <option value="7">7 Rounds</option>
+          <option value="10" selected>10 Rounds (Standard)</option>
+          <option value="15">15 Rounds (Marathon)</option>
         </select>
 
         <label>Answer Time Limit</label>
@@ -695,6 +698,52 @@
       START GAME ▶
     </button>
     <button class="btn btn-secondary" onclick="window.leaveGame()">← CANCEL</button>
+  </div>
+</div>
+
+<!-- ===== CONNECTION CHECK ===== -->
+<div id="screen-diagnose" class="screen">
+  <div class="container" style="padding-top: 40px;">
+    <div class="logo-wrap"><span class="logo" style="font-size: 40px;">SPITWIT</span></div>
+
+    <div class="card">
+      <div class="card-title">CONNECTION CHECK</div>
+      <p class="text-muted" style="font-size:14px;margin-bottom:14px;">
+        Run this on the device that can't get in. It tests the same three steps joining a game uses
+        and tells you which one is failing.
+      </p>
+      <label>Room code (optional — lets us test the actual room)</label>
+      <input type="text" id="diag-code" placeholder="ROOM CODE" maxlength="4" autocomplete="off" spellcheck="false"
+             style="text-transform:uppercase;font-family:var(--font-display);font-size:24px;letter-spacing:5px;text-align:center;">
+      <button class="btn btn-accent" id="diag-run-btn" onclick="window.runConnectionCheck()">RUN CHECK</button>
+      <div id="diag-progress" class="text-muted" style="font-size:14px;margin-top:10px;display:none;"></div>
+    </div>
+
+    <div class="card" id="diag-result-card" style="display:none;">
+      <div class="card-title">RESULT</div>
+      <div id="diag-verdict" style="font-weight:800;font-size:16px;line-height:1.45;margin-bottom:8px;"></div>
+      <div id="diag-fix" class="text-muted" style="font-size:14px;line-height:1.45;margin-bottom:14px;"></div>
+      <pre id="diag-report" style="white-space:pre-wrap;word-break:break-word;background:var(--surface2);border:2px solid var(--border-thick);border-radius:12px;padding:12px;font-size:12px;line-height:1.5;max-height:320px;overflow:auto;margin:0 0 12px;"></pre>
+      <button class="btn btn-secondary" id="diag-copy-btn" onclick="window.copyConnectionReport()">COPY REPORT</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">YOUR OWN RELAY (ADVANCED)</div>
+      <p class="text-muted" style="font-size:14px;margin-bottom:12px;">
+        Free public relays are shared, rate-limited and go away without notice — that is what failed here.
+        Paste TURN credentials from any provider and this device will use them instead. Saved on this device only;
+        the host should set them too.
+      </p>
+      <textarea id="diag-ice" rows="4" placeholder='[{"urls":"turn:your.server:443?transport=tcp","username":"user","credential":"pass"}]'
+                style="font-family:ui-monospace,monospace;font-size:12px;"></textarea>
+      <div class="row">
+        <button class="btn btn-secondary" id="diag-ice-save" onclick="window.saveIceOverride()">SAVE</button>
+        <button class="btn btn-secondary" id="diag-ice-reset" onclick="window.clearIceOverride()">RESET</button>
+      </div>
+      <div id="diag-ice-status" class="text-muted" style="font-size:13px;margin-top:8px;"></div>
+    </div>
+
+    <button class="btn btn-secondary" onclick="window.showScreen('screen-home')">← BACK</button>
   </div>
 </div>
 

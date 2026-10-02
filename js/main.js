@@ -7,7 +7,9 @@ import { openHostDisplay } from './tv.js';
 import { showScreen, switchTab, renderCustomPrompts, copyRoomCode,
          updateCharCounter, selectVote } from './ui.js';
 import { startHosting, joinGame } from './network.js';
-import { normalizeRoomCode, ROOM_CODE_LENGTH } from './net-config.js';
+import { normalizeRoomCode, ROOM_CODE_LENGTH, iceServers,
+         saveIceOverride as persistIce, clearIceOverride as resetIce, hasIceOverride } from './net-config.js';
+import { runDiagnostics, formatReport } from './diagnose.js';
 import { hostStartGame, hostNextRound, hostContinue, submitAnswer,
          submitVote, leaveGame, playAgain } from './game.js';
 import { showRecap } from './ui.js';
@@ -124,6 +126,74 @@ function quickJoinFromHome() {
 }
 
 // =====================================================
+//  CONNECTION CHECK
+// =====================================================
+let lastReportText = '';
+
+function showConnectionCheck() {
+  showScreen('screen-diagnose');
+  const codeEl = document.getElementById('diag-code');
+  const joined = document.getElementById('join-code')?.value || document.getElementById('quick-join-code')?.value;
+  if (codeEl && joined && !codeEl.value) codeEl.value = normalizeRoomCode(joined);
+  const iceEl = document.getElementById('diag-ice');
+  if (iceEl && !iceEl.value && hasIceOverride()) iceEl.value = JSON.stringify(iceServers(), null, 2);
+  const st = document.getElementById('diag-ice-status');
+  if (st) st.textContent = hasIceOverride()
+    ? 'Using your own relay settings on this device.'
+    : 'Using the built-in public relays.';
+}
+
+async function runConnectionCheck() {
+  const btn = document.getElementById('diag-run-btn');
+  const prog = document.getElementById('diag-progress');
+  const card = document.getElementById('diag-result-card');
+  btn.disabled = true;
+  btn.textContent = 'CHECKING…';
+  prog.style.display = 'block';
+  card.style.display = 'none';
+
+  const code = normalizeRoomCode(document.getElementById('diag-code').value);
+  try {
+    const report = await runDiagnostics(code.length === ROOM_CODE_LENGTH ? code : '', msg => { prog.textContent = msg; });
+    lastReportText = formatReport(report);
+    document.getElementById('diag-verdict').textContent = report.verdict || '';
+    document.getElementById('diag-fix').textContent = report.fixable || '';
+    document.getElementById('diag-report').textContent = lastReportText;
+    card.style.display = 'block';
+  } catch (e) {
+    document.getElementById('diag-verdict').textContent = 'The check itself failed.';
+    document.getElementById('diag-fix').textContent = e.message;
+    document.getElementById('diag-report').textContent = String(e.stack || e);
+    card.style.display = 'block';
+  }
+  prog.style.display = 'none';
+  btn.disabled = false;
+  btn.textContent = 'RUN CHECK AGAIN';
+}
+
+function copyConnectionReport() {
+  if (!lastReportText) return;
+  navigator.clipboard.writeText(lastReportText)
+    .then(() => notify('Report copied — paste it to whoever is fixing this 📋'))
+    .catch(() => notify('Could not copy. Select the text and copy it manually.'));
+}
+
+function saveIceOverrideFromUI() {
+  const err = persistIce(document.getElementById('diag-ice').value);
+  const st = document.getElementById('diag-ice-status');
+  if (err) { st.textContent = '⚠️ ' + err; return; }
+  st.textContent = '✓ Saved. Reconnect for it to take effect.';
+  notify('Relay settings saved on this device');
+}
+
+function clearIceOverrideFromUI() {
+  resetIce();
+  document.getElementById('diag-ice').value = '';
+  document.getElementById('diag-ice-status').textContent = 'Back to the built-in public relays.';
+  notify('Relay settings reset');
+}
+
+// =====================================================
 //  DOODLE BACKGROUND
 // =====================================================
 function initDoodles() {
@@ -166,6 +236,11 @@ function exposeGlobals() {
   window.openHostDisplay = openHostDisplay;
   window.notify = notify;
   window.quickJoinFromHome = quickJoinFromHome;
+  window.showConnectionCheck = showConnectionCheck;
+  window.runConnectionCheck = runConnectionCheck;
+  window.copyConnectionReport = copyConnectionReport;
+  window.saveIceOverride = saveIceOverrideFromUI;
+  window.clearIceOverride = clearIceOverrideFromUI;
 }
 
 // =====================================================
@@ -182,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Keep both code fields sized to the real code length (they used to accept 10
   // characters, which let a mistyped code look like a connection failure).
-  ['quick-join-code', 'join-code'].forEach(id => {
+  ['quick-join-code', 'join-code', 'diag-code'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.maxLength = ROOM_CODE_LENGTH;
   });
@@ -193,6 +268,9 @@ document.addEventListener('DOMContentLoaded', () => {
     quickJoinInput.addEventListener('input', () => { quickJoinInput.value = normalizeRoomCode(quickJoinInput.value); });
     quickJoinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') quickJoinFromHome(); });
   }
+
+  const diagInput = document.getElementById('diag-code');
+  if (diagInput) diagInput.addEventListener('input', () => { diagInput.value = normalizeRoomCode(diagInput.value); });
 
   // Auto-uppercase join code
   const codeInput = document.getElementById('join-code');

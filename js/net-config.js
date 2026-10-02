@@ -22,6 +22,16 @@ const DEFAULT_ICE_SERVERS = [
   { urls: ['stun:stun.l.google.com:19302',
            'stun:stun1.l.google.com:19302',
            'stun:stun.cloudflare.com:3478'] },
+  // Both the old and current OpenRelay hostnames. One of these is likely dead —
+  // the first TURN fix shipped only the old one and players still could not
+  // connect — and ICE just ignores a server it cannot reach, so listing several
+  // independent endpoints is strictly better than betting on one.
+  { urls: 'turn:staticauth.openrelay.metered.ca:80',
+    username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:staticauth.openrelay.metered.ca:443',
+    username: 'openrelayproject', credential: 'openrelayproject' },
+  { urls: 'turn:staticauth.openrelay.metered.ca:443?transport=tcp',
+    username: 'openrelayproject', credential: 'openrelayproject' },
   { urls: 'turn:openrelay.metered.ca:80',
     username: 'openrelayproject', credential: 'openrelayproject' },
   { urls: 'turn:openrelay.metered.ca:443',
@@ -58,6 +68,36 @@ function loadIceOverride() {
 
 export function iceServers() {
   return loadIceOverride() || DEFAULT_ICE_SERVERS;
+}
+
+export function hasIceOverride() {
+  return loadIceOverride() !== null;
+}
+
+// Returns an error string, or null on success.
+export function saveIceOverride(text) {
+  const raw = (text || '').trim();
+  if (!raw) return 'Paste a JSON array of ICE servers.';
+  let parsed;
+  try { parsed = JSON.parse(raw); } catch (e) { return 'That is not valid JSON: ' + e.message; }
+  if (!Array.isArray(parsed) || !parsed.length) return 'Expected a non-empty JSON array.';
+  for (const entry of parsed) {
+    if (!entry || typeof entry !== 'object') return 'Every entry must be an object.';
+    const u = Array.isArray(entry.urls) ? entry.urls[0] : entry.urls;
+    if (typeof u !== 'string' || !/^(stun|stuns|turn|turns):/.test(u)) {
+      return 'Every entry needs a "urls" starting with stun: or turn:.';
+    }
+    if (/^turns?:/.test(u) && (!entry.username || !entry.credential)) {
+      return 'TURN entries need a username and credential.';
+    }
+  }
+  try { localStorage.setItem(ICE_OVERRIDE_KEY, JSON.stringify(parsed)); }
+  catch (e) { return 'Could not save: ' + e.message; }
+  return null;
+}
+
+export function clearIceOverride() {
+  try { localStorage.removeItem(ICE_OVERRIDE_KEY); } catch (e) {}
 }
 
 // Shared PeerJS options. `iceCandidatePoolSize` warms candidates up front so
