@@ -591,54 +591,59 @@ export const PERSONAL_PROMPT_TEMPLATES = [
   "The secret talent [A] definitely has but refuses to admit",
 ];
 
+// Fisher-Yates. `.sort(() => Math.random() - 0.5)` is not a shuffle: it leaves
+// elements near where they started, so the same templates and the same players
+// kept surfacing first.
+function shuffled(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export function buildPersonalizedPool(players, totalPromptsNeeded) {
   const names = players.map(p => p.name);
-  const shuffledTemplates = [...PERSONAL_PROMPT_TEMPLATES].sort(() => Math.random() - 0.5);
+  let templates = shuffled(PERSONAL_PROMPT_TEMPLATES);
   const result = [];
 
   let templateIdx = 0;
-  let playerQueue = [];
+  // A draw-without-replacement queue: everybody gets named once before anyone
+  // is named twice. With more players than rounds that is the difference
+  // between naming N different people and naming the same person twice while
+  // someone else never comes up at all.
+  let playerQueue = shuffled(names);
 
   const nextPlayer = (exclude) => {
-    if (!playerQueue.length) playerQueue = [...names].sort(() => Math.random() - 0.5);
-    if (exclude && playerQueue[0] === exclude && playerQueue.length > 1) {
-      playerQueue.push(playerQueue.shift());
+    if (!playerQueue.length) playerQueue = shuffled(names);
+    let idx = 0;
+    if (exclude && playerQueue[idx] === exclude) {
+      if (playerQueue.length === 1) return playerQueue.shift();  // only one left
+      idx = 1;
     }
-    return playerQueue.shift();
+    return playerQueue.splice(idx, 1)[0];
   };
 
+  // Prefer templates that name two people when the group is big enough to run
+  // out of rounds before it runs out of players — twice the coverage per round.
+  const twoPlayerFirst = names.length > totalPromptsNeeded;
+  if (twoPlayerFirst) {
+    const pairs = templates.filter(t => t.includes('[B]'));
+    const solos = templates.filter(t => !t.includes('[B]'));
+    templates = [...pairs, ...solos];
+  }
+
   while (result.length < totalPromptsNeeded) {
-    if (templateIdx >= shuffledTemplates.length) {
-      shuffledTemplates.sort(() => Math.random() - 0.5);
+    if (templateIdx >= templates.length) {
+      templates = shuffled(templates);
       templateIdx = 0;
     }
-    const template = shuffledTemplates[templateIdx++];
+    const template = templates[templateIdx++];
     const a = nextPlayer(null);
-    const b = nextPlayer(a);
-    result.push(template.replace(/\[A\]/g, a).replace(/\[B\]/g, b));
+    const b = template.includes('[B]') ? nextPlayer(a) : null;
+    result.push(template.replace(/\[A\]/g, a).replace(/\[B\]/g, b || a));
   }
 
   return result;
-}
-
-export function interleavePersonal(regularPool, personalPool, promptsPerRound, numPlayers) {
-  const personalPerRound = Math.min(promptsPerRound, numPlayers);
-  const regularPerRound = promptsPerRound - personalPerRound;
-
-  const shuffledRegular = [...regularPool].sort(() => Math.random() - 0.5);
-  const combined = [];
-  let regIdx = 0;
-  let perIdx = 0;
-
-  const rounds = Math.ceil(shuffledRegular.length / Math.max(1, regularPerRound));
-  for (let r = 0; r < rounds && perIdx < personalPool.length; r++) {
-    for (let i = 0; i < personalPerRound && perIdx < personalPool.length; i++) {
-      combined.push(personalPool[perIdx++]);
-    }
-    for (let i = 0; i < regularPerRound && regIdx < shuffledRegular.length; i++) {
-      combined.push(shuffledRegular[regIdx++]);
-    }
-  }
-  while (regIdx < shuffledRegular.length) combined.push(shuffledRegular[regIdx++]);
-  return combined;
 }

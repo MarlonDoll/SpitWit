@@ -7,6 +7,7 @@ import { openHostDisplay } from './tv.js';
 import { showScreen, switchTab, renderCustomPrompts, copyRoomCode,
          updateCharCounter, selectVote } from './ui.js';
 import { startHosting, joinGame } from './network.js';
+import { normalizeRoomCode, ROOM_CODE_LENGTH } from './net-config.js';
 import { hostStartGame, hostNextRound, hostContinue, submitAnswer,
          submitVote, leaveGame, playAgain } from './game.js';
 import { showRecap } from './ui.js';
@@ -113,7 +114,7 @@ function importPromptsFromFile(fileInput) {
 //  QUICK JOIN FROM HOME SCREEN
 // =====================================================
 function quickJoinFromHome() {
-  const code = document.getElementById('quick-join-code').value.trim().toUpperCase().replace(/0/g, 'O');
+  const code = normalizeRoomCode(document.getElementById('quick-join-code').value);
   const joinCodeEl = document.getElementById('join-code');
   if (joinCodeEl && code) joinCodeEl.value = code;
   showScreen('screen-join');
@@ -179,10 +180,17 @@ document.addEventListener('DOMContentLoaded', () => {
   initDoodles();
   exposeGlobals();
 
+  // Keep both code fields sized to the real code length (they used to accept 10
+  // characters, which let a mistyped code look like a connection failure).
+  ['quick-join-code', 'join-code'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.maxLength = ROOM_CODE_LENGTH;
+  });
+
   // Quick-join code: auto-uppercase + Enter to submit
   const quickJoinInput = document.getElementById('quick-join-code');
   if (quickJoinInput) {
-    quickJoinInput.addEventListener('input', () => { quickJoinInput.value = quickJoinInput.value.toUpperCase().replace(/0/g, 'O'); });
+    quickJoinInput.addEventListener('input', () => { quickJoinInput.value = normalizeRoomCode(quickJoinInput.value); });
     quickJoinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') quickJoinFromHome(); });
   }
 
@@ -190,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const codeInput = document.getElementById('join-code');
   if (codeInput) {
     codeInput.addEventListener('input', () => {
-      codeInput.value = codeInput.value.toUpperCase().replace(/0/g, 'O');
+      codeInput.value = normalizeRoomCode(codeInput.value);
     });
   }
 

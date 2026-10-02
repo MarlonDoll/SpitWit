@@ -1,13 +1,13 @@
 // =====================================================
 //  SPITWIT — Game Flow Logic
 // =====================================================
-import { state, clearTimer, shuffle, notify } from './state.js';
-import { PROMPT_PACKS, UNIQUE_PROMPTS, buildPersonalizedPool, interleavePersonal } from './prompts.js';
+import { state, clearTimer, shuffle, notify, votingSeconds } from './state.js';
+import { PROMPT_PACKS, UNIQUE_PROMPTS, buildPersonalizedPool } from './prompts.js';
 import { SFX } from './audio.js';
 import { openHostDisplay, tvUpdate, trackAnswerForTV, closeTvWindow } from './tv.js';
 import { startAnsweringPhase, startVotingPhase, showResultsPhase,
          showScoreboardPhase, showWinnerPhase, showScreen, selectVote } from './ui.js';
-import { broadcastToAll, sendToHost, sendReliable } from './network.js';
+import { broadcastToAll, sendToHost, sendReliable, bumpEpoch, stopHeartbeat } from './network.js';
 
 export function hostStartGame() {
   if (state.players.filter(p => !p.disconnected).length < 1) {
@@ -20,11 +20,13 @@ export function hostStartGame() {
   const promptsPerRound = 1;
   const totalPromptsNeeded = settings.rounds * promptsPerRound;
 
+  // Share of rounds that name real players when Personal Prompts is on. These
+  // are the prompts people actually react to, so they lead rather than garnish.
+  const PERSONAL_SHARE = 0.6;
+
   let pool;
   if (settings.promptPack === 'personalized') {
-    pool = buildPersonalizedPool(state.players, totalPromptsNeeded);
-    shuffle(pool);
-    state.prompts = pool.slice(0, totalPromptsNeeded);
+    state.prompts = buildPersonalizedPool(state.players, totalPromptsNeeded);
   } else {
     if (settings.promptPack === 'all') pool = [...UNIQUE_PROMPTS];
     else if (settings.promptPack === 'custom-only') pool = [...(settings.customPrompts || [])];
@@ -34,14 +36,21 @@ export function hostStartGame() {
       pool = [...pool, ...settings.customPrompts];
     }
 
-    if (settings.personalPrompts && state.players.length >= 2) {
-      const personalNeeded = settings.rounds * state.players.length;
-      const personalPool = buildPersonalizedPool(state.players, personalNeeded);
-      pool = interleavePersonal(pool, personalPool, promptsPerRound, state.players.length);
-    }
-
     shuffle(pool);
-    state.prompts = pool.slice(0, totalPromptsNeeded);
+
+    if (settings.personalPrompts && state.players.length >= 2) {
+      // Decide how many rounds are personal, then build exactly that many.
+      // The old code merged ~95 personal prompts into a 435-prompt pool and
+      // shuffled the lot, so a 5-round game drew 0.9 personal prompts on
+      // average and 38% of games had none at all — the toggle was on and
+      // essentially did nothing.
+      const personalCount = Math.max(1, Math.round(totalPromptsNeeded * PERSONAL_SHARE));
+      const personal = buildPersonalizedPool(state.players, personalCount);
+      const regular = pool.slice(0, Math.max(0, totalPromptsNeeded - personal.length));
+      state.prompts = shuffle([...personal, ...regular]).slice(0, totalPromptsNeeded);
+    } else {
+      state.prompts = pool.slice(0, totalPromptsNeeded);
+    }
   }
 
   state.totalRounds = settings.rounds;
@@ -121,6 +130,13 @@ export function hostNextPrompt() {
 }
 
 export function checkAllAnswered() {
+  // A late answer can arrive after the round has already moved on — an ACK retry,
+  // or a client auto-submitting partial text as the deadline passes. Without this
+  // guard that answer completed the set, called clearTimer() and killed the *vote*
+  // timer, then no-oped in hostStartVoting's phase check: the round hung on the
+  // voting screen until every last player happened to vote.
+  if (state.phase !== 'answering') return;
+
   // Only count non-disconnected players who haven't answered yet
   const activePlayers = state.players.filter(p => !p.disconnected);
   const allAnswered = activePlayers.every(p => state.answers[p.id] !== undefined);
@@ -163,7 +179,7 @@ export function hostStartVoting() {
     (state.currentPromptIdx % promptsPerRound) + 1, promptsPerRound);
 
   clearTimer();
-  let t = state.gameSettings.voteTime;
+  let t = votingSeconds(state.gameSettings.voteTime, answersArr.length);
 
   SFX.stopTick();
   if (t > 5) {
@@ -181,6 +197,8 @@ export function hostStartVoting() {
 }
 
 export function checkAllVoted() {
+  if (state.phase !== 'voting') return;   // same hazard: a late vote must not re-tally
+
   // All active (non-disconnected) players must have voted (null = abstain counts)
   const activePlayers = state.players.filter(p => !p.disconnected);
   const allVoted = activePlayers.every(p => p.id in state.votes);
@@ -193,6 +211,8 @@ export function checkAllVoted() {
 }
 
 export function hostTallyVotes() {
+  if (state.phase === 'results') return;  // scores are awarded here; never run it twice
+
   // Include host vote
   if (state.myVote) state.votes[state.myId] = state.myVote;
 
@@ -325,6 +345,13 @@ export function leaveGame() {
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
   closeTvWindow();
   document.getElementById('host-display-btn').classList.remove('visible');
+
+  // Invalidate every in-flight network callback before tearing the peer down,
+  // so a retry or reconnect timer from this session can't fire into the next one.
+  bumpEpoch();
+  stopHeartbeat();
+  Object.values(state.pendingMessages).forEach(p => clearTimeout(p.timerId));
+  state.connections.forEach(c => { try { c.close(); } catch(e) {} });
   if (state.peer) { try { state.peer.destroy(); } catch(e) {} state.peer = null; }
 
   const savedCustomPrompts = state.customPrompts || [];
@@ -335,6 +362,8 @@ export function leaveGame() {
     timerInterval: null, visualTimer: null, phase: 'lobby', customPrompts: savedCustomPrompts,
     myVote: null, myAnswer: '', answerSubmitted: false, voteSubmitted: false,
     recap: [], phaseStartTime: 0, pendingMessages: {},
+    roomCode: '', heartbeatInterval: null, lastHostContact: 0,
+    lastSyncRequest: 0, reconnecting: false,
   });
   showScreen('screen-home');
 }
