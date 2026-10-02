@@ -125,6 +125,22 @@ test('votingSeconds()', () => {
   assert(Number.isInteger(votingSeconds(20, 19)), 'returns whole seconds');
 });
 
+// ===== PERSONAL TEMPLATE LIBRARY =====
+test('PERSONAL_PROMPT_TEMPLATES library', () => {
+  const t = PERSONAL_PROMPT_TEMPLATES;
+  const dupes = t.filter((x, i, a) => a.indexOf(x) !== i);
+  assert(dupes.length === 0, `no duplicate templates (found ${JSON.stringify(dupes)})`);
+  assert(t.every(x => x.includes('[A]')), 'every template names [A]');
+  assert(!t.some(x => x.includes('[B]') && !x.includes('[A]')), 'no template uses [B] without [A]');
+  assert(!t.some(x => /\[C\]|\[D\]/.test(x)), 'no placeholders the generator cannot fill');
+
+  // Pair templates are what the generator reaches for first in a big room, so a
+  // thin supply means the same few prompts every game night.
+  const pairs = t.filter(x => x.includes('[B]'));
+  assert(pairs.length >= 20, `enough two-name templates to stay fresh (${pairs.length})`);
+  assert(t.every(x => x.trim().length > 10), 'no stub templates');
+});
+
 // ===== PERSONALIZATION TESTS =====
 test('buildPersonalizedPool() coverage', () => {
   const players = Array.from({ length: 19 }, (_, i) => ({ name: 'Player' + i }));
@@ -138,14 +154,45 @@ test('buildPersonalizedPool() coverage', () => {
   pool.forEach(q => players.forEach(p => { if (new RegExp('\\b' + p.name + '\\b').test(q)) named.add(p.name); }));
   assert(named.size >= 3, `3 prompts name at least 3 different people (named ${named.size})`);
 
-  // A two-player template must not pair someone with themselves.
   const big = buildPersonalizedPool(players, 40);
-  const selfPaired = big.filter(q => {
-    const hits = players.filter(p => new RegExp('\\b' + p.name + '\\b').test(q));
-    return hits.length === 1 && (q.match(new RegExp('\\b' + hits[0].name + '\\b', 'g')) || []).length > 1
-           && !/the most .*-coded|The most \w+ thing/i.test(q);
-  });
-  assert(selfPaired.length === 0, `nobody is paired with themselves (${selfPaired.length} cases)`);
+  assert(big.every(q => unsubstitute(q, players.map(p => p.name)) !== null),
+         'every generated prompt maps back to a real template');
+});
+
+// Turn a finished prompt back into its template by replacing the first player
+// named with [A] and the second with [B], then look it up. A prompt built from
+// a two-name template but filled with one name cannot map back, so this catches
+// self-pairing exactly — unlike counting name occurrences, which trips over the
+// templates that legitimately use [A] twice.
+function unsubstitute(prompt, names) {
+  const found = [];
+  const re = new RegExp('\\b(' + names.join('|') + ')\\b', 'g');
+  let mm;
+  while ((mm = re.exec(prompt)) !== null) if (!found.includes(mm[1])) found.push(mm[1]);
+  if (!found.length) return null;
+  let shape = prompt;
+  shape = shape.replace(new RegExp('\\b' + found[0] + '\\b', 'g'), '[A]');
+  if (found[1]) shape = shape.replace(new RegExp('\\b' + found[1] + '\\b', 'g'), '[B]');
+  return PERSONAL_PROMPT_TEMPLATES.includes(shape) ? shape : null;
+}
+
+test('buildPersonalizedPool() never pairs someone with themselves', () => {
+  // A one-player game is reachable through the 'personalized' prompt pack,
+  // which has no minimum player count. [B] used to fall back to [A], giving
+  // "What Solo and Solo would name their band".
+  const solo = buildPersonalizedPool([{ name: 'Solo' }], 30);
+  const soloShapes = solo.map(q => unsubstitute(q, ['Solo']));
+  assert(soloShapes.every(sh => sh !== null), 'one-player prompts map back to real templates');
+  assert(soloShapes.every(sh => sh && !sh.includes('[B]')),
+         'a lone player is never handed a two-name template');
+
+  const pair = buildPersonalizedPool([{ name: 'Ash' }, { name: 'Bo' }], 30);
+  const pairShapes = pair.map(q => unsubstitute(q, ['Ash', 'Bo']));
+  assert(pairShapes.every(sh => sh !== null), 'two-player prompts map back to real templates');
+  // Any two-name prompt must actually name both of them.
+  const twoName = pair.filter((q, i) => pairShapes[i] && pairShapes[i].includes('[B]'));
+  assert(twoName.every(q => /\bAsh\b/.test(q) && /\bBo\b/.test(q)),
+         'a two-name prompt names two different players');
 });
 
 test('buildPersonalizedPool() with tiny groups', () => {

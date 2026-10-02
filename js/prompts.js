@@ -535,7 +535,6 @@ export const PERSONAL_PROMPT_TEMPLATES = [
   "What [A] and [B] would argue about on a road trip",
   "What [A] thinks about during an awkward silence",
   "The conspiracy theory [A] secretly believes",
-  "What [A] brings to every potluck no matter what",
   "The most likely reason [A] would get banned from a buffet",
   "What [A] is actually doing when they say they're 'working from home'",
   "The Wikipedia article [A] has read the most times",
@@ -589,6 +588,30 @@ export const PERSONAL_PROMPT_TEMPLATES = [
   "The documentary Netflix would make about [A]",
   "What [A] would say as their last words, and why it'd be embarrassing",
   "The secret talent [A] definitely has but refuses to admit",
+
+  // ===== TWO-NAME TEMPLATES =====
+  // These name two players at once, so with more players than rounds the
+  // generator reaches for them first and covers twice as many people. Mixed
+  // frames on purpose — twelve variations of "What [A] and [B] would..." in a
+  // row starts to feel like one joke.
+  "The business [A] and [B] would start together, and the exact week it collapses",
+  "What [A] and [B] would get banned from a cruise ship for",
+  "The reason [A] and [B] can no longer be seated together",
+  "What [A] and [B] would bond over while stuck in an elevator",
+  "The worst possible job for [A] and [B] to do as a team",
+  "What [A] and [B]'s secret handshake looks like",
+  "The vacation [A] and [B] should absolutely never take together",
+  "What [A] and [B] are arguing about in the group chat at 3AM",
+  "The heist [A] and [B] would pull off, and which one of them gets caught",
+  "What [A] and [B] would name their restaurant, and the one dish on the menu",
+  "The reality show where [A] and [B] are the problem contestants",
+  "How the group project with [A] and [B] ends",
+  "What [A] secretly judges [B] for",
+  "What [A] would say about [B] in a wedding speech that went too far",
+  "The thing [A] borrowed from [B] and never gave back",
+  "What [A] tells people about [B] when [B] isn't in the room",
+  "The favour [A] would never ask [B] for",
+  "What [A] would tell the police about [B]",
 ];
 
 // Fisher-Yates. `.sort(() => Math.random() - 0.5)` is not a shuffle: it leaves
@@ -606,6 +629,10 @@ function shuffled(arr) {
 export function buildPersonalizedPool(players, totalPromptsNeeded) {
   const names = players.map(p => p.name);
   let templates = shuffled(PERSONAL_PROMPT_TEMPLATES);
+  if (names.length < 2) {
+    const solo = templates.filter(t => !t.includes('[B]'));
+    if (solo.length) templates = solo;
+  }
   const result = [];
 
   let templateIdx = 0;
